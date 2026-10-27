@@ -35,15 +35,7 @@ th{background:#efe6da}
 .home-card:hover{transform:scale(1.03)}
 .home-card .emo{font-size:64px}
 #cycleInfo{min-height:150px;font-size:21px}
-.edge{cursor:pointer}
-.edge .vis{fill:none;stroke:#888;stroke-width:4;marker-end:url(#ah)}
-.edge:hover .vis{stroke:#444}
-.edge.on .vis{stroke:#e8590c;stroke-width:6;marker-end:url(#ahOn);stroke-dasharray:14 8;animation:flow 0.8s linear infinite}
 @keyframes flow{to{stroke-dashoffset:-22}}
-.edge text{font-size:19px;font-weight:bold;fill:#333;paint-order:stroke;stroke:#fff;stroke-width:6px}
-.edge.on text{fill:#e8590c}
-.node{cursor:pointer}
-.node text{fill:#fff;font-size:24px;font-weight:bold;pointer-events:none}
 .steps{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .steps span{padding:4px 14px;border-radius:20px;background:#e5ddd0;color:#777;transition:.3s}
 .steps span.on{background:var(--sed);color:#fff;font-weight:bold;transform:scale(1.08)}
@@ -97,13 +89,13 @@ ol.flow li{margin-bottom:4px}
   <h2>🔁 岩石循環</h2>
   <div class="two">
     <div class="card">
-      <svg id="cycleSvg" viewBox="0 0 800 540" style="width:100%"></svg>
+      <svg id="cycleSvg" viewBox="0 0 700 590" style="width:100%"></svg>
       <button class="btn" style="background:#e8590c" id="playBtn" onclick="togglePlay()">▶ 自動播放主循環</button>
       <button class="btn" onclick="clearEdge()">清除</button>
     </div>
     <div class="card" id="cycleInfo">
-      <h3>👆 點擊箭咀或圓圈</h3>
-      <p>點擊任何一個<b>箭咀</b>，查看岩石之間如何轉化；點擊<b>圓圈</b>，查看岩石類型簡介。</p>
+      <h3>👆 點擊箭咀、方框或橢圓</h3>
+      <p>點擊任何一個<b>箭咀</b>或<b>過程名稱</b>，查看岩石之間如何轉化；點擊<b>方框</b>或<b>橢圓</b>，查看簡介。</p>
     </div>
   </div>
   <details class="notes"><summary>📒 教師筆記：岩石循環</summary>
@@ -544,26 +536,6 @@ function togglePlay(){const b=document.getElementById('playBtn');
   if(playTimer){clearInterval(playTimer);playTimer=null;b.textContent='▶ 自動播放主循環';return;}
   b.textContent='⏸ 暫停';playIdx=0;pickEdge(PLAY[0]);
   playTimer=setInterval(()=>{playIdx=(playIdx+1)%PLAY.length;pickEdge(PLAY[playIdx]);},4500);}
-buildCycle();
-  let s=`<defs>
-   <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#888"/></marker>
-   <marker id="ahOn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e8590c"/></marker></defs>`;
-  E.forEach((e,i)=>{const g=edgeGeo(e[0],e[1],e[3],e[4]);
-    s+=`<g class="edge" id="edge${i}" onclick="pickEdge(${i})"><path d="${g.d}" stroke="transparent" stroke-width="26" fill="none"/><path class="vis" d="${g.d}"/><text x="${g.lx}" y="${g.ly}" text-anchor="middle" dominant-baseline="middle">${e[2]}</text></g>`;});
-  for(const k in N){const n=N[k];
-    s+=`<g class="node" onclick="pickNode('${k}')"><circle cx="${n.x}" cy="${n.y}" r="52" fill="${n.c}" stroke="#fff" stroke-width="4"/><text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle">${n.t}</text></g>`;}
-  document.getElementById('cycleSvg').innerHTML=s;
-}
-function clearEdge(){document.querySelectorAll('.edge').forEach(x=>x.classList.remove('on'));}
-function pickEdge(i){clearEdge();document.getElementById('edge'+i).classList.add('on');const e=E[i];
-  document.getElementById('cycleInfo').innerHTML=`<h3>${N[e[0]].t} ➜ ${N[e[1]].t}</h3><p style="font-size:24px;color:#e8590c"><b>${e[2]}</b></p><p>${e[5]}</p>`;}
-function pickNode(k){clearEdge();const n=N[k];
-  document.getElementById('cycleInfo').innerHTML=`<h3 style="color:${n.c}">${n.t}</h3><p>${n.info}</p>`+(n.page?`<button class="btn" style="background:${n.c}" onclick="show('${n.page}')">前往「${n.t}」動畫 →</button>`:'');}
-let playTimer=null,playIdx=0;
-function togglePlay(){const b=document.getElementById('playBtn');
-  if(playTimer){clearInterval(playTimer);playTimer=null;b.textContent='▶ 自動播放主循環';return;}
-  b.textContent='⏸ 暫停';playIdx=0;pickEdge(0);
-  playTimer=setInterval(()=>{playIdx=(playIdx+1)%5;pickEdge(playIdx);},4500);}
 buildCycle();
 
 /* ================= 火成岩：晶體模擬 ================= */
