@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>岩石形成｜DSE 地理</title>
+<style>
+:root{--ig:#d9534f;--sed:#e0a526;--met:#5b6abf;--bg:#f6f3ee;--dark:#3e2f23}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;background:var(--bg);color:#333;font-size:20px;line-height:1.6}
+header{background:var(--dark);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:10}
+header h1{margin:0;font-size:24px}
+nav{display:flex;flex-wrap:wrap;gap:6px}
+nav button{font-size:18px;padding:6px 14px;border:none;border-radius:20px;background:#5a4636;color:#fff;cursor:pointer;font-family:inherit}
+nav button.on{background:#f0c36d;color:#3e2f23;font-weight:bold}
+.page{display:none;padding:20px;max-width:1200px;margin:auto}
+.page.active{display:block}
+h2{margin:6px 0 12px;font-size:30px}
+h3{margin:4px 0 8px}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:850px){.two,.three{grid-template-columns:1fr}}
+canvas{width:100%;border-radius:10px;display:block}
+.btn{font-size:18px;padding:8px 16px;border:none;border-radius:10px;cursor:pointer;color:#fff;margin:4px;font-family:inherit;background:#666}
+.btn:hover{filter:brightness(1.1)}
+.ig{background:var(--ig)}.sed{background:var(--sed)}.met{background:var(--met)}
+details.notes{background:#fffbe6;border-left:6px solid var(--sed);padding:10px 16px;border-radius:8px;margin-top:14px}
+details.notes summary{cursor:pointer;font-weight:bold;font-size:21px}
+.tip{background:#ffeeee;border-left:6px solid var(--ig);padding:10px 16px;border-radius:8px;margin-top:12px}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{border:1px solid #ccc;padding:10px;text-align:left;vertical-align:top}
+th{background:#efe6da}
+.home-card{cursor:pointer;text-align:center;color:#fff;border-radius:16px;padding:26px;transition:transform .2s}
+.home-card:hover{transform:scale(1.03)}
+.home-card .emo{font-size:64px}
+#cycleInfo{min-height:150px;font-size:21px}
+.edge{cursor:pointer}
+.edge .vis{fill:none;stroke:#888;stroke-width:4;marker-end:url(#ah)}
+.edge:hover .vis{stroke:#444}
+.edge.on .vis{stroke:#e8590c;stroke-width:6;marker-end:url(#ahOn);stroke-dasharray:14 8;animation:flow 0.8s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-22}}
+.edge text{font-size:19px;font-weight:bold;fill:#333;paint-order:stroke;stroke:#fff;stroke-width:6px}
+.edge.on text{fill:#e8590c}
+.node{cursor:pointer}
+.node text{fill:#fff;font-size:24px;font-weight:bold;pointer-events:none}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.steps span{padding:4px 14px;border-radius:20px;background:#e5ddd0;color:#777;transition:.3s}
+.steps span.on{background:var(--sed);color:#fff;font-weight:bold;transform:scale(1.08)}
+.rockname{font-size:32px;font-weight:bold;color:var(--met)}
+input[type=range]{width:100%;height:28px}
+.q{margin-bottom:16px}
+.q button{display:block;width:100%;text-align:left;font-size:19px;margin:5px 0;padding:8px 12px;border:2px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit}
+.q button.right{background:#d4f5d4;border-color:#3a3}
+.q button.wrong{background:#fbd5d5;border-color:#c33}
+.q .exp{display:none;background:#eef4ff;padding:8px 12px;border-radius:8px;margin-top:6px}
+.tag{display:inline-block;padding:2px 10px;border-radius:12px;color:#fff;font-size:16px;margin-right:6px}
+ol.flow li{margin-bottom:4px}
+.mini svg{width:100%;border-radius:10px;background:#eef6fb}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🪨 岩石形成</h1>
+  <nav>
+    <button data-p="home" class="on">首頁</button>
+    <button data-p="cycle">🔁 岩石循環</button>
+    <button data-p="igneous">🌋 火成岩</button>
+    <button data-p="sedimentary">🪨 沉積岩</button>
+    <button data-p="metamorphic">💎 變質岩</button>
+    <button data-p="compare">📊 比較</button>
+    <button data-p="hk">🇭🇰 香港實例</button>
+    <button data-p="quiz">✏️ 小測</button>
+    <button onclick="fullScreen()">⛶ 全螢幕</button>
+  </nav>
+</header>
+
+<!-- ===================== 首頁 ===================== -->
+<section class="page active" id="home">
+  <h2>岩石是怎樣形成的？</h2>
+  <p>岩石按<b>形成過程</b>可分為三大類。點擊下面的卡片開始探索。</p>
+  <div class="three">
+    <div class="home-card ig" onclick="show('igneous')"><div class="emo">🌋</div><h3>火成岩</h3><p>岩漿／熔岩<br><b>冷卻和凝固</b>而成</p></div>
+    <div class="home-card sed" onclick="show('sedimentary')"><div class="emo">🪨</div><h3>沉積岩</h3><p>沉積物經<b>沉積、壓實、<br>膠結及岩化作用</b>而成</p></div>
+    <div class="home-card met" onclick="show('metamorphic')"><div class="emo">💎</div><h3>變質岩</h3><p>母岩受<b>壓力</b>及／或<b>熱力</b><br>影響而成</p></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3>🔁 三類岩石會互相轉化</h3>
+    <p>這個不斷循環的過程稱為<b>岩石循環</b>。</p>
+    <button class="btn" style="background:#e8590c" onclick="show('cycle')">查看岩石循環 →</button>
+  </div>
+</section>
+
+<!-- ===================== 岩石循環 ===================== -->
+<section class="page" id="cycle">
+  <h2>🔁 岩石循環</h2>
+  <div class="two">
+    <div class="card">
+      <svg id="cycleSvg" viewBox="0 0 800 540" style="width:100%"></svg>
+      <button class="btn" style="background:#e8590c" id="playBtn" onclick="togglePlay()">▶ 自動播放主循環</button>
+      <button class="btn" onclick="clearEdge()">清除</button>
+    </div>
+    <div class="card" id="cycleInfo">
+      <h3>👆 點擊箭咀或圓圈</h3>
+      <p>點擊任何一個<b>箭咀</b>，查看岩石之間如何轉化；點擊<b>圓圈</b>，查看岩石類型簡介。</p>
+    </div>
+  </div>
+  <details class="notes"><summary>📒 教師筆記：岩石循環</summary>
+    <ul>
+      <li>三類岩石可透過<b>冷卻和凝固、風化和侵蝕、搬運作用、沉積作用、壓實作用、膠結作用、岩化作用、變質作用、熔融</b>等過程互相轉化。</li>
+      <li>推動岩石循環的能量：<b>地球內部熱能</b>（熔融、變質、抬升）及<b>太陽能</b>（推動風化、侵蝕、搬運）。</li>
+      <li>與板塊構造的連繫：<b>聚合性板塊邊界</b>上岩石熔融成岩漿，亦會出現區域變質作用；<b>地殼抬升</b>把地殼深處的岩石帶到地表，接受風化和侵蝕。</li>
+      <li>循環沒有固定路線：任何岩石都可以被風化、變質或熔融。</li>
+    </ul>
+  </details>
+  <div class="tip">⚠️ <b>DSE 貼士：</b>描述轉化時要寫出<b>過程名稱</b>，例如「沉積物經<b>壓實作用</b>及<b>膠結作用</b>，最後經<b>岩化作用</b>形成沉積岩」，只寫「變成」會失分。</div>
+</section>
+
+<!-- ===================== 火成岩 ===================== -->
+<section class="page" id="igneous">
+  <h2>🌋 火成岩</h2>
+  <div class="card">
+    <svg viewBox="0 0 800 330" style="width:100%">
+      <rect width="800" height="90" fill="#cfe8f7"/>
+      <rect y="90" width="800" height="240" fill="#a68a6d"/>
+      <rect y="150" width="800" height="70" fill="#957a5e"/>
+      <rect y="220" width="800" height="110" fill="#86694f"/>
+      <polygon points="300,90 400,20 500,90" fill="#7b5e48"/>
+      <rect x="392" y="40" width="16" height="230" fill="#e8590c"/>
+      <ellipse cx="400" cy="285" rx="150" ry="38" fill="#e8590c"/>
+      <path d="M400,22 Q440,40 470,70 Q520,92 620,92 L620,98 Q520,98 470,80 Q430,55 400,30 Z" fill="#ff7b29"/>
+      <text x="560" y="28" font-size="20" font-weight="bold" fill="#c0392b">噴出岩（火山岩）</text>
+      <text x="560" y="52" font-size="17" fill="#333">熔岩在地表冷卻速度快</text>
+      <text x="560" y="74" font-size="17" fill="#333">→ 晶體幼細</text>
+      <text x="570" y="262" font-size="20" font-weight="bold" fill="#fff">侵入岩（深成岩）</text>
+      <text x="570" y="286" font-size="17" fill="#fff">岩漿在地殼深處</text>
+      <text x="570" y="308" font-size="17" fill="#fff">冷卻速度慢 → 晶體粗大</text>
+      <text x="20" y="84" font-size="18" fill="#333">地表</text>
+      <text x="20" y="125" font-size="18" fill="#fff">地殼</text>
+      <text x="415" y="190" font-size="17" fill="#fff">岩漿上升</text>
+      <text x="345" y="292" font-size="18" font-weight="bold" fill="#fff">岩漿</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h3>📖 形成過程</h3>
+    <table>
+      <tr><th></th><th>過程</th><th>形成（例）</th></tr>
+      <tr><td><b>噴出<br>火山作用</b></td><td>熔岩或其他火山物質（例如火山灰）在<b>地表</b>冷卻和<b>凝固</b></td><td><b>噴出岩／火山岩</b><br>例：流紋岩、凝灰岩、玄武岩</td></tr>
+      <tr><td><b>侵入<br>火山作用</b></td><td>岩漿在<b>地殼內</b>冷卻和<b>凝固</b><br>礦物聚合</td><td><b>侵入岩／深成岩</b><br>例：花崗岩、輝長岩</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>🔬 模擬：冷卻速度如何影響晶體大小？</h3>
+    <button class="btn" style="background:#a99a8a" onclick="setIg('light')">淺色：花崗岩 對比 流紋岩</button>
+    <button class="btn" style="background:#333" onclick="setIg('dark')">深色：輝長岩 對比 玄武岩</button><br>
+    <button class="btn ig" onclick="startCrystal()">▶ 開始冷卻</button>
+    <button class="btn" onclick="resetCrystal()">↺ 重設</button>
+    <p id="igNote">淺色岩石：<b>二氧化硅含量較高</b></p>
+    <div class="two">
+      <div><b>⬇️ 地殼深處：岩漿冷卻速度慢</b><br><canvas id="cvSlow" width="320" height="220"></canvas>
+        <p>結晶進度：<span id="pSlow">0</span>%<br>➜ <b id="nSlow">花崗岩</b>（侵入岩／深成岩）：<b>晶體粗大</b></p></div>
+      <div><b>⬆️ 地表：熔岩冷卻速度快</b><br><canvas id="cvFast" width="320" height="220"></canvas>
+        <p>結晶進度：<span id="pFast">0</span>%<br>➜ <b id="nFast">流紋岩</b>（噴出岩／火山岩）：<b>晶體幼細</b></p></div>
+    </div>
+    <p>🟠 橙紅色＝仍未凝固的岩漿／熔岩　｜　留意：兩邊同時開始，晶體同時生長</p>
+  </div>
+
+  <div class="card">
+    <h3>📊 岩石特徵對比</h3>
+    <table>
+      <tr><th>火成岩種類</th><th>噴出岩</th><th>侵入岩</th></tr>
+      <tr><td>晶體結構</td><td colspan="2">具有，晶體互相緊扣</td></tr>
+      <tr><td>層理</td><td colspan="2">沒有</td></tr>
+      <tr><td>節理</td><td colspan="2">較多</td></tr>
+      <tr><td>結構</td><td colspan="2">結實／堅硬</td></tr>
+      <tr><td>是否含有化石</td><td colspan="2">不含（因為岩漿或熔岩的高溫會破壞動植物殘骸）</td></tr>
+      <tr><td>顏色</td><td colspan="2">可以是深色或淺色（流紋岩／花崗岩）<br>視乎二氧化硅含量：含量愈高，岩石的顏色愈淺</td></tr>
+      <tr><td>組成物質</td><td>熔岩或其他火山物質</td><td>岩漿</td></tr>
+      <tr><td>形成地點</td><td>地表</td><td>地殼深處</td></tr>
+      <tr><td>冷卻速度</td><td><b>快</b></td><td><b>慢</b></td></tr>
+      <tr><td>晶體大小</td><td><b>晶體幼細</b><br>（熔岩或其他火山物質在地表冷卻速度快）</td><td><b>晶體粗大</b><br>（岩漿在地殼深處冷卻速度慢）</td></tr>
+    </table>
+  </div>
+  <details class="notes"><summary>📒 教師筆記：火成岩</summary>
+    <ul>
+      <li><b>晶體大小原理</b>：冷卻速度慢，礦物有足夠時間聚合，形成粗大晶體；冷卻速度快，晶體來不及長大，形成幼細晶體。</li>
+      <li><b>顏色</b>：二氧化硅含量高 → 淺色（花崗岩、流紋岩）；二氧化硅含量低 → 深色（輝長岩、玄武岩）。</li>
+      <li>對比組合：花崗岩與流紋岩成分相近，分別只在於冷卻地點和速度；輝長岩與玄武岩亦一樣。</li>
+      <li><b>凝灰岩</b>：火山灰堆積、凝固而成，是香港常見的火山岩。</li>
+    </ul>
+  </details>
+  <div class="tip">⚠️ <b>DSE 貼士：</b>解釋晶體大小要寫完整因果鏈：<b>形成地點 → 冷卻速度 → 礦物聚合時間 → 晶體大小</b>。</div>
+</section>
+
+<!-- ===================== 沉積岩 ===================== -->
+<section class="page" id="sedimentary">
+  <h2>🪨 沉積岩</h2>
+  <div class="card">
+    <h3>🔬 模擬：碎屑沉積岩的形成</h3>
+    <div class="steps" id="sedSteps">
+      <span>① 風化和侵蝕</span><span>② 搬運作用</span><span>③ 沉積作用</span><span>④ 壓實作用</span><span>⑤ 膠結作用</span><span>⑥ 岩化作用</span>
+    </div>
+    <canvas id="sedCv" width="640" height="380"></canvas>
+    <div style="margin-top:8px">
+      <b>加入沉積物：</b>
+      <button class="btn" style="background:#8d7b68" onclick="addLayer('gravel')">礫石（渾圓）</button>
+      <button class="btn" style="background:#5f5850" onclick="addLayer('angular')">礫石（菱角）</button>
+      <button class="btn" style="background:#d9ae5c" onclick="addLayer('sand')">砂粒</button>
+      <button class="btn" style="background:#9a7e62" onclick="addLayer('silt')">粉砂</button>
+      <button class="btn" style="background:#66635b" onclick="addLayer('clay')">黏土</button>
+      <button class="btn" style="background:#b8ae94" onclick="addLayer('shell')">貝殼殘骸</button>
+      <br><b>之後：</b>
+      <button class="btn sed" onclick="compact()">⬇️ 壓實、膠結、岩化</button>
+      <button class="btn" onclick="resetSed()">↺ 重設</button>
+    </div>
+    <p id="sedMsg"></p>
+  </div>
+
+  <div class="card">
+    <h3>📖 碎屑沉積岩的形成過程</h3>
+    <ol class="flow">
+      <li>岩石<b>風化</b>和<b>侵蝕</b>，產生鬆散碎屑和顆粒</li>
+      <li>風化物通過<b>搬運作用</b>被搬運到山坡下</li>
+      <li>沉積物在湖泊、沿河流或淺水海域裏沉積，造成<b>沉積作用</b></li>
+      <li>沉積物一層一層的堆積起來，重量把下層的沉積物壓實，造成<b>壓實作用</b></li>
+      <li>溶於水中的礦物，把鬆散的沉積物膠結在一起，造成<b>膠結作用</b></li>
+      <li>鬆散的沉積物轉變成堅固的岩石，造成<b>岩化作用</b></li>
+    </ol>
+    <table>
+      <tr><th>碎屑沉積岩（按顆粒大小排列）</th><th>顆粒名稱</th></tr>
+      <tr><td><b>礫岩</b>（含渾圓顆粒）<br><b>角礫岩</b>（含菱角顆粒）</td><td>巨礫／中礫／卵石／細礫</td></tr>
+      <tr><td><b>砂岩</b></td><td>砂粒</td></tr>
+      <tr><td><b>泥岩</b>和粉砂岩</td><td>粉砂</td></tr>
+      <tr><td><b>頁岩</b></td><td>黏土</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>📖 非碎屑沉積岩</h3>
+    <div class="two">
+      <div>
+        <b>🧪 由化學作用形成</b>
+        <p>化學沉澱：鹽水水體蒸發 → <b>石膏、岩鹽</b></p>
+        <canvas id="evCv" width="360" height="200"></canvas>
+        <button class="btn" style="background:#2d8fc4" onclick="evap()">☀️ 開始蒸發</button>
+      </div>
+      <div>
+        <b>🐚 由生物作用形成</b>
+        <p>・貝殼殘骸／海洋生物骸骨 → <b>石灰岩／白堊岩</b></p>
+        <p>・植被殘骸遭淹埋在沼澤裏，經長期積壓 → <b>煤</b></p>
+        <svg viewBox="0 0 360 200" style="width:100%;border-radius:10px">
+          <rect width="360" height="200" fill="#cfe8f7"/>
+          <rect y="70" width="360" height="40" fill="#6d8f4e"/>
+          <text x="20" y="40" font-size="26">🌳🌿🌳🌿🌳🌿🌳</text>
+          <text x="10" y="95" font-size="15" fill="#fff">沼澤：植被殘骸遭淹埋</text>
+          <rect y="110" width="360" height="30" fill="#8a6a4f"/>
+          <rect y="140" width="360" height="22" fill="#3a3028"/>
+          <rect y="162" width="360" height="38" fill="#1b1714"/>
+          <text x="10" y="130" font-size="15" fill="#fff">⬇️ 上覆沉積物長期積壓</text>
+          <text x="10" y="187" font-size="18" font-weight="bold" fill="#fff">煤</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 岩石特徵對比</h3>
+    <table>
+      <tr><th>沉積岩種類</th><th>碎屑沉積岩</th><th>非碎屑沉積岩</th></tr>
+      <tr><td>晶體結構</td><td>沒有（由碎屑顆粒組成）</td><td>部分具有晶體（例如岩鹽、石膏）</td></tr>
+      <tr><td>層理</td><td colspan="2">有</td></tr>
+      <tr><td>節理</td><td colspan="2">有</td></tr>
+      <tr><td>結構</td><td colspan="2">鬆軟</td></tr>
+      <tr><td>是否含有化石</td><td colspan="2">可能含有化石</td></tr>
+      <tr><td>顏色</td><td colspan="2">顏色各異／顏色根據形成物質的顏色，以及形成的環境和氣候而定</td></tr>
+      <tr><td>形成地點</td><td>地表</td><td>地表</td></tr>
+      <tr><td>組成物質</td><td>經侵蝕後剝落的岩石碎屑</td><td>由化學作用或生物作用形成</td></tr>
+    </table>
+  </div>
+  <div class="tip">⚠️ <b>DSE 貼士：</b>化石主要見於沉積岩。火成岩不含化石，因為岩漿或熔岩的高溫會破壞動植物殘骸。</div>
+</section>
+
+<!-- ===================== 變質岩 ===================== -->
+<section class="page" id="metamorphic">
+  <h2>💎 變質岩</h2>
+  <div class="three">
+    <div class="card mini">
+      <h3>⚡ 動力變質作用</h3>
+      <svg viewBox="0 0 300 220">
+        <rect x="0" y="40" width="140" height="180" fill="#b59b7c"/>
+        <rect x="160" y="20" width="140" height="180" fill="#b59b7c"/>
+        <g stroke="#7a6248" stroke-width="6"><line x1="0" y1="90" x2="140" y2="90"/><line x1="0" y1="140" x2="140" y2="140"/><line x1="0" y1="190" x2="140" y2="190"/>
+        <line x1="160" y1="70" x2="300" y2="70"/><line x1="160" y1="120" x2="300" y2="120"/><line x1="160" y1="170" x2="300" y2="170"/></g>
+        <rect x="140" y="20" width="20" height="200" fill="#d8cbb8"/>
+        <g fill="#6b5a48"><polygon points="142,40 152,35 149,48"/><polygon points="150,70 158,78 146,80"/><polygon points="143,110 155,104 153,118"/><polygon points="148,150 158,146 152,160"/><polygon points="142,190 154,186 150,200"/></g>
+        <g fill="#c0392b"><polygon points="60,0 80,0 80,14 92,14 70,34 48,14 60,14"/><polygon points="220,220 240,220 240,206 252,206 230,186 208,206 220,206"/></g>
+        <text x="100" y="15" font-size="14" font-weight="bold" fill="#333">斷層面</text>
+      </svg>
+      <ul style="font-size:18px">
+        <li>岩石沿斷層面位移會產生<b>高壓</b></li>
+        <li>導致岩石<b>碎裂</b></li>
+        <li>壓力令岩石中的礦物顆粒變得扁平並重新排列</li>
+        <li>岩石的礦物成分只有很少或完全沒有變化</li>
+      </ul>
+    </div>
+    <div class="card mini">
+      <h3>🔥 熱力／接觸變質作用</h3>
+      <svg viewBox="0 0 300 220">
+        <rect width="300" height="220" fill="#c9c2b0"/>
+        <g stroke="#b3ab97" stroke-width="3"><line x1="0" y1="50" x2="300" y2="50"/><line x1="0" y1="90" x2="300" y2="90"/><line x1="0" y1="130" x2="300" y2="130"/></g>
+        <ellipse cx="150" cy="215" rx="125" ry="110" fill="#f7f5ef" stroke="#999" stroke-dasharray="6 4"/>
+        <ellipse cx="150" cy="220" rx="80" ry="70" fill="#e8590c"/>
+        <text x="128" y="200" font-size="18" font-weight="bold" fill="#fff">岩漿</text>
+        <text x="95" y="135" font-size="14" font-weight="bold" fill="#555">接觸帶：大理岩</text>
+        <text x="10" y="30" font-size="15" font-weight="bold" fill="#555">石灰岩</text>
+        <text x="25" y="190" font-size="20">🔥</text><text x="250" y="190" font-size="20">🔥</text>
+      </svg>
+      <ul style="font-size:18px">
+        <li>岩漿侵入地表以下的岩石</li>
+        <li>在接觸到岩石的<b>接觸帶</b></li>
+        <li>岩漿的熱力使岩石的溫度<b>上升</b></li>
+        <li>礦物熔融並<b>重新結晶</b></li>
+        <li>例：石灰岩 → <b>大理岩</b></li>
+      </ul>
+    </div>
+    <div class="card mini">
+      <h3>⛰️ 區域變質作用</h3>
+      <svg viewBox="0 0 300 220">
+        <polygon points="40,60 100,10 150,50 200,5 260,60" fill="#8a7a66"/>
+        <rect y="60" width="300" height="160" fill="#a99880"/>
+        <g fill="none" stroke-width="10">
+          <path d="M30,90 Q75,60 120,90 T210,90 T300,90" stroke="#7a6a56"/>
+          <path d="M30,125 Q75,95 120,125 T210,125 T300,125" stroke="#c4b49a"/>
+          <path d="M30,160 Q75,130 120,160 T210,160 T300,160" stroke="#6a5a48"/>
+          <path d="M30,195 Q75,165 120,195 T210,195 T300,195" stroke="#d2c2a6"/>
+        </g>
+        <g fill="#2c3e80"><polygon points="0,130 18,115 18,123 32,123 32,137 18,137 18,145"/>
+        <polygon points="300,130 282,115 282,123 268,123 268,137 282,137 282,145"/></g>
+        <text x="60" y="215" font-size="14" font-weight="bold" fill="#fff">擠壓力 → 褶曲 ← 擠壓力</text>
+      </svg>
+      <ul style="font-size:18px">
+        <li>在<b>聚合性板塊邊界</b>，強烈的擠壓力導致大規模造山運動的地區</li>
+        <li>出現<b>褶曲</b>和斷層作用</li>
+        <li>岩石圈受壓變形，岩石因擠壓力變得短和厚</li>
+        <li>岩石被迫進入地殼深處，地殼深度<b>增加</b>，溫度<b>上升</b>和壓力<b>增加</b></li>
+        <li>礦物重新結晶，並以<b>大致垂直於擠壓力的方向</b>重新排列</li>
+        <li>例：<b>片麻岩</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="card"><canvas id="metCv" width="480" height="400"></canvas></div>
+    <div class="card">
+      <h3>🔬 模擬：母岩受熱力和壓力影響</h3>
+      <b>母岩：</b><br>
+      <button class="btn met" onclick="setParent('shale')">頁岩</button>
+      <button class="btn met" onclick="setParent('limestone')">石灰岩</button>
+      <button class="btn met" onclick="setParent('sandstone')">砂岩</button>
+      <button class="btn met" onclick="setParent('coal')">煤</button>
+      <p>🔥 熱力：<span id="tVal">0</span><input type="range" id="tSl" min="0" max="100" value="0"></p>
+      <p>⬇️⬆️ 壓力：<span id="pVal">0</span><input type="range" id="pSl" min="0" max="100" value="0"></p>
+      <button class="btn" style="background:#c0392b" onclick="preset(85,10)">熱力／接觸變質作用</button>
+      <button class="btn" style="background:#2c3e80" onclick="preset(75,90)">區域變質作用</button>
+      <button class="btn" onclick="preset(0,0)">↺ 重設</button>
+      <hr>
+      <div>變成：<span class="rockname" id="metName">頁岩</span></div>
+      <p id="metDesc"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 岩石特徵對比</h3>
+    <table>
+      <tr><th></th><th>葉理結構變質岩</th><th>非葉理結構變質岩</th></tr>
+      <tr><td>晶體結構</td><td colspan="2">具有（礦物重新結晶）</td></tr>
+      <tr><td>結構</td><td colspan="2">相比母岩較為結實</td></tr>
+      <tr><td>是否含有化石</td><td colspan="2">不含化石（高壓和高溫會摧毀化石）</td></tr>
+      <tr><td>岩石變質條件</td><td><b>壓力</b></td><td><b>熱力</b></td></tr>
+      <tr><td>排列形式</td><td>扁平或細長的礦物以平行的方式排列<br>常見的葉理結構包括：<br>・很薄的層理<br>・帶光澤的表面<br>・深淺相間的礦物帶</td><td>沒有明顯的排列形式<br>（岩石不會變得扁平或重新排列）</td></tr>
+      <tr><td>顆粒大小</td><td>顆粒幼細至粗大<br>・幼粒：板岩、千枚岩<br>・中粒至粗粒：片岩、片麻岩</td><td>顆粒幼細至中等<br>・幼粒：無煙煤<br>・中粒：石英岩、大理岩</td></tr>
+    </table>
+  </div>
+  <details class="notes"><summary>📒 教師筆記：變質岩</summary>
+    <ul>
+      <li>變質過程中，岩石整體並未完全熔化；若岩石完全熔融，便會成為岩漿，重新進入岩石循環。</li>
+      <li>葉理結構：礦物受擠壓力影響，以大致垂直於擠壓力的方向重新排列。</li>
+      <li>母岩 → 變質岩：頁岩 → 板岩 → 千枚岩 → 片岩 → 片麻岩；石灰岩 → 大理岩；砂岩 → 石英岩；煤 → 無煙煤。</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ===================== 比較 ===================== -->
+<section class="page" id="compare">
+  <h2>📊 三大岩石比較</h2>
+  <div class="card">
+    <table>
+      <tr><th>項目</th><th style="background:#f6d0cf">🌋 火成岩</th><th style="background:#f7e6bd">🪨 沉積岩</th><th style="background:#d4d8f2">💎 變質岩</th></tr>
+      <tr><td><b>形成過程</b></td><td>岩漿／熔岩冷卻和凝固</td><td>沉積作用、壓實作用、膠結作用、岩化作用</td><td>母岩受壓力及／或熱力影響，礦物重新結晶或重新排列</td></tr>
+      <tr><td><b>晶體結構</b></td><td>具有，晶體互相緊扣</td><td>碎屑沉積岩沒有（由顆粒組成）</td><td>具有（重新結晶）</td></tr>
+      <tr><td><b>層理／葉理</b></td><td>沒有層理</td><td>有層理</td><td>葉理結構或非葉理結構</td></tr>
+      <tr><td><b>結構</b></td><td>結實／堅硬</td><td>鬆軟</td><td>相比母岩較為結實</td></tr>
+      <tr><td><b>化石</b></td><td>不含</td><td>可能含有</td><td>不含</td></tr>
+      <tr><td><b>例子</b></td><td>花崗岩、輝長岩、流紋岩、凝灰岩、玄武岩</td><td>礫岩、角礫岩、砂岩、泥岩、頁岩、石灰岩、煤</td><td>板岩、千枚岩、片岩、片麻岩、大理岩、石英岩、無煙煤</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>🔍 快速辨認</h3>
+    <p>晶體互相緊扣、沒有層理？ → <span class="tag ig">火成岩</span></p>
+    <p>有層理、由顆粒組成、可能有化石？ → <span class="tag sed">沉積岩</span></p>
+    <p>扁平或細長的礦物以平行的方式排列（葉理結構）？ → <span class="tag met">變質岩</span></p>
+  </div>
+</section>
+
+<!-- ===================== 香港實例 ===================== -->
+<section class="page" id="hk">
+  <h2>🇭🇰 香港岩石實例</h2>
+  <div class="three">
+    <div class="card" style="border-top:8px solid var(--ig)"><h3>🌋 萬宜水庫東壩</h3><p><b>六角形岩柱（凝灰岩）</b><br>約 1.4 億年前火山爆發，火山灰堆積後冷卻收縮，形成柱狀節理。屬香港聯合國教科文組織世界地質公園。</p></div>
+    <div class="card" style="border-top:8px solid var(--ig)"><h3>🌋 獅子山／九龍</h3><p><b>花崗岩（侵入岩）</b><br>岩漿在地殼深處冷卻速度慢，晶體粗大；後因上覆岩石被侵蝕而外露。</p></div>
+    <div class="card" style="border-top:8px solid var(--sed)"><h3>🪨 東平洲</h3><p><b>粉砂岩</b><br>層理清晰，層層相疊，是香港最年輕的岩石之一。</p></div>
+    <div class="card" style="border-top:8px solid var(--sed)"><h3>🪨 赤洲</h3><p><b>紅色砂岩及礫岩</b><br>形成於炎熱乾燥的環境，岩石中的氧化鐵令岩石呈紅色。</p></div>
+    <div class="card" style="border-top:8px solid var(--met)"><h3>💎 馬鞍山</h3><p><b>熱力／接觸變質作用</b><br>花崗岩漿侵入大理岩，接觸帶形成磁鐵礦，昔日為香港鐵礦場。</p></div>
+    <div class="card" style="border-top:8px solid var(--met)"><h3>💎 元朗、天水圍地底</h3><p><b>大理岩</b><br>大理岩可被溶蝕形成地底溶洞，令建築地基工程更困難。</p></div>
+  </div>
+  <div class="tip">📌 建議參考土木工程拓展署（土力工程處）及香港地質公園網站核實資料。</div>
+</section>
+
+<!-- ===================== 小測 ===================== -->
+<section class="page" id="quiz">
+  <h2>✏️ 課堂小測　<span id="score" style="font-size:22px;color:#e8590c"></span></h2>
+  <button class="btn" onclick="buildQuiz()">↺ 重新作答</button>
+  <div id="quizBox"></div>
+</section>
+
+<script>
+/* ---------- 頁面切換 ---------- */
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('nav button[data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p===id));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button[data-p]').forEach(b=>b.onclick=()=>show(b.dataset.p));
+function fullScreen(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+
+/* ---------- 工具 ---------- */
+function hexRgb(h){h=h.replace('#','');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+function mix(a,b,f){const A=hexRgb(a),B=hexRgb(b);return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*f)).join(',')})`;}
+function pickW(list){let s=list.reduce((a,b)=>a+b[1],0),r=Math.random()*s;for(const it of list){r-=it[1];if(r<=0)return it[0];}return list[0][0];}
+function rand(a,b){return a+Math.random()*(b-a);}
+
+/* ================= 岩石循環 ================= */
+const N={
+  ig:{x:130,y:230,t:'火成岩',c:'#d9534f',page:'igneous',info:'由岩漿或熔岩<b>冷卻和凝固</b>而成。分為<b>噴出岩（火山岩）</b>及<b>侵入岩（深成岩）</b>。'},
+  sd:{x:400,y:70,t:'沉積物',c:'#b08d57',info:'岩石經<b>風化和侵蝕</b>後產生的鬆散碎屑和顆粒，例如礫石、砂粒、粉砂、黏土。'},
+  se:{x:670,y:230,t:'沉積岩',c:'#e0a526',page:'sedimentary',info:'沉積物經<b>沉積作用、壓實作用、膠結作用及岩化作用</b>而成，具有層理，可能含有化石。'},
+  me:{x:560,y:460,t:'變質岩',c:'#5b6abf',page:'metamorphic',info:'母岩受<b>壓力</b>及／或<b>熱力</b>影響，礦物重新結晶或重新排列而成。'},
+  ma:{x:240,y:460,t:'岩漿',c:'#e8590c',info:'地殼深處熔融的岩石。岩漿到達地表後稱為<b>熔岩</b>。'}
+};
+const E=[
+  ['ma','ig','冷卻和凝固','out',40,'・岩漿在<b>地殼內</b>冷卻和凝固 → <b>侵入岩（深成岩）</b>，例如花崗岩、輝長岩<br>・熔岩或其他火山物質在<b>地表</b>冷卻和凝固 → <b>噴出岩（火山岩）</b>，例如流紋岩、凝灰岩、玄武岩'],
+  ['ig','sd','風化、侵蝕、搬運','out',40,'岩石外露於地表，經<b>風化和侵蝕</b>，產生鬆散碎屑和顆粒，再通過<b>搬運作用</b>被搬運到山坡下、河流、湖泊或淺水海域。'],
+  ['sd','se','沉積、壓實、膠結','out',40,'沉積物在湖泊、沿河流或淺水海域裏沉積（<b>沉積作用</b>）→ 一層一層堆積，重量把下層壓實（<b>壓實作用</b>）→ 溶於水中的礦物把沉積物膠結在一起（<b>膠結作用</b>）→ 轉變成堅固的岩石（<b>岩化作用</b>）。'],
+  ['se','me','變質作用','out',40,'沉積岩受<b>熱力</b>及／或<b>壓力</b>影響，礦物重新結晶或重新排列，形成變質岩。<br>例：石灰岩 → 大理岩（熱力／接觸變質作用）<br>　　頁岩 → 板岩 → 片岩 → 片麻岩（區域變質作用）'],
+  ['me','ma','熔融','out',40,'在地殼深處或聚合性板塊邊界，溫度持續上升，岩石完全<b>熔融</b>，成為岩漿。'],
+  ['ig','me','變質作用','in',35,'火成岩同樣可以受熱力和壓力影響而<b>變質</b>。<br>例：花崗岩 → 片麻岩。'],
+  ['se','sd','抬升、風化','in',40,'沉積岩被地殼運動<b>抬升</b>至地表，再次受風化和侵蝕，變回沉積物。'],
+  ['me','sd','抬升、風化','in',30,'變質岩被地殼運動<b>抬升</b>並外露於地表，同樣會受風化和侵蝕，變回沉積物。']
+];
+const C0={x:400,y:290};
+function edgeGeo(a,b,dir,k){
+  const A=N[a],B=N[b],mx=(A.x+B.x)/2,my=(A.y+B.y)/2,dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy);
+  const px=-dy/L,py=dx/L;let cx=mx+px*k,cy=my+py*k;
+  const isOut=Math.hypot(cx-C0.x,cy-C0.y)>Math.hypot(mx-C0.x,my-C0.y);
+  if((dir==='out')!==isOut){cx=mx-px*k;cy=my-py*k;}
+  const R=54,u=(x,y)=>{const l=Math.hypot(x,y);return[x/l,y/l]};
+  const [ux,uy]=u(cx-A.x,cy-A.y),[vx,vy]=u(cx-B.x,cy-B.y);
+  const sx=A.x+ux*R,sy=A.y+uy*R,ex=B.x+vx*(R+8),ey=B.y+vy*(R+8);
+  return{d:`M${sx},${sy} Q${cx},${cy} ${ex},${ey}`,lx:.25*sx+.5*cx+.25*ex,ly:.25*sy+.5*cy+.25*ey};
+}
+function buildCycle(){
+  let s=`<defs>
+   <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#888"/></marker>
+   <marker id="ahOn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e8590c"/></marker></defs>`;
+  E.forEach((e,i)=>{const g=edgeGeo(e[0],e[1],e[3],e[4]);
+    s+=`<g class="edge" id="edge${i}" onclick="pickEdge(${i})"><path d="${g.d}" stroke="transparent" stroke-width="26" fill="none"/><path class="vis" d="${g.d}"/><text x="${g.lx}" y="${g.ly}" text-anchor="middle" dominant-baseline="middle">${e[2]}</text></g>`;});
+  for(const k in N){const n=N[k];
+    s+=`<g class="node" onclick="pickNode('${k}')"><circle cx="${n.x}" cy="${n.y}" r="52" fill="${n.c}" stroke="#fff" stroke-width="4"/><text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle">${n.t}</text></g>`;}
+  document.getElementById('cycleSvg').innerHTML=s;
+}
+function clearEdge(){document.querySelectorAll('.edge').forEach(x=>x.classList.remove('on'));}
+function pickEdge(i){clearEdge();document.getElementById('edge'+i).classList.add('on');const e=E[i];
+  document.getElementById('cycleInfo').innerHTML=`<h3>${N[e[0]].t} ➜ ${N[e[1]].t}</h3><p style="font-size:24px;color:#e8590c"><b>${e[2]}</b></p><p>${e[5]}</p>`;}
+function pickNode(k){clearEdge();const n=N[k];
+  document.getElementById('cycleInfo').innerHTML=`<h3 style="color:${n.c}">${n.t}</h3><p>${n.info}</p>`+(n.page?`<button class="btn" style="background:${n.c}" onclick="show('${n.page}')">前往「${n.t}」動畫 →</button>`:'');}
+let playTimer=null,playIdx=0;
+function togglePlay(){const b=document.getElementById('playBtn');
+  if(playTimer){clearInterval(playTimer);playTimer=null;b.textContent='▶ 自動播放主循環';return;}
+  b.textContent='⏸ 暫停';playIdx=0;pickEdge(0);
+  playTimer=setInterval(()=>{playIdx=(playIdx+1)%5;pickEdge(playIdx);},4500);}
+buildCycle();
+
+/* ================= 火成岩：晶體模擬 ================= */
+const GRANITE=[['#ece7dc',30],['#b9b6ae',30],['#e3a08c',25],['#1f1f1f',15]];
+const RHYO=[['#e2d3c8',35],['#cdb8aa',30],['#efe6de',25],['#a38f84',10]];
+const GABBRO=[['#262626',40],['#3a4636',25],['#d6d6cc',30],['#5a5a5a',5]];
+const BASALT=[['#2a2a2a',40],['#3b3b3b',30],['#4d4d4d',20],['#56653f',10]];
+const IGSET={light:{s:'花崗岩',sp:GRANITE,f:'流紋岩',fp:RHYO},dark:{s:'輝長岩',sp:GABBRO,f:'玄武岩',fp:BASALT}};
+let igMode='light';
+function makeSim(id,n,pal){
+  const cv=document.getElementById(id),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  const seeds=[];for(let i=0;i<n;i++)seeds.push({x:Math.random()*W,y:Math.random()*H,c:hexRgb(pickW(pal))});
+  const near=new Int32Array(W*H),d1=new Float32Array(W*H),edge=new Uint8Array(W*H),noise=new Float32Array(W*H);let maxD=0;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){let b=1e9,b2=1e9,bi=0;
+    for(let i=0;i<n;i++){const dx=x-seeds[i].x,dy=y-seeds[i].y,d=dx*dx+dy*dy;if(d<b){b2=b;b=d;bi=i;}else if(d<b2)b2=d;}
+    const k=y*W+x,s1=Math.sqrt(b);near[k]=bi;d1[k]=s1;edge[k]=(Math.sqrt(b2)-s1)<1.4?1:0;noise[k]=Math.random();if(s1>maxD)maxD=s1;}
+  return{ctx,W,H,seeds,near,d1,edge,noise,maxD,r:0,img:ctx.createImageData(W,H)};
+}
+function drawSim(S){const d=S.img.data;
+  for(let k=0;k<S.W*S.H;k++){let r,g,b;
+    if(S.d1[k]<=S.r){const c=S.seeds[S.near[k]].c,f=S.edge[k]?0.6:(0.92+S.noise[k]*0.12);r=c[0]*f;g=c[1]*f;b=c[2]*f;}
+    else{const n=S.noise[k];r=220+n*35;g=70+n*60;b=20;}
+    d[k*4]=r;d[k*4+1]=g;d[k*4+2]=b;d[k*4+3]=255;}
+  S.ctx.putImageData(S.img,0,0);}
+let simSlow,simFast,crysAnim=null;
+function setIg(m){igMode=m;
+  document.getElementById('igNote').innerHTML=m==='light'?'淺色岩石：<b>二氧化硅含量較高</b>':'深色岩石：<b>二氧化硅含量較低</b>';
+  resetCrystal();}
+function resetCrystal(){if(crysAnim)cancelAnimationFrame(crysAnim);crysAnim=null;const S=IGSET[igMode];
+  simSlow=makeSim('cvSlow',16,S.sp);simFast=makeSim('cvFast',700,S.fp);
+  drawSim(simSlow);drawSim(simFast);
+  document.getElementById('pSlow').textContent=0;document.getElementById('pFast').textContent=0;
+  document.getElementById('nSlow').textContent=S.s;document.getElementById('nFast').textContent=S.f;}
+function startCrystal(){resetCrystal();
+  const step=()=>{let go=false;
+    [[simSlow,'pSlow'],[simFast,'pFast']].forEach(([S,id])=>{if(S.r<S.maxD){S.r+=0.35;go=true;drawSim(S);
+      document.getElementById(id).textContent=Math.min(100,Math.round(S.r/S.maxD*100));}});
+    if(go)crysAnim=requestAnimationFrame(step);};
+  step();}
+resetCrystal();
+
+/* ================= 沉積岩 ================= */
+const sv=document.getElementById('sedCv'),sx=sv.getContext('2d'),SW=sv.width,SH=sv.height,BOT=SH-8,WATER=60;
+const TYPES={
+  gravel:{r:[4,7],shape:'round',c:['#8d7b68','#a39382','#6f6458'],base:'#9c8c78',rock:'礫岩',vy:4.5,h:48,cnt:60},
+  angular:{r:[4,7],shape:'ang',c:['#7d746a','#958a7c','#5f5850'],base:'#8a7f72',rock:'角礫岩',vy:4.5,h:48,cnt:60},
+  sand:{r:[1.8,3],shape:'round',c:['#e6c27a','#d9ae5c','#f0d79a'],base:'#e2bd72',rock:'砂岩',vy:2.8,h:42,cnt:240},
+  silt:{r:[1,1.6],shape:'round',c:['#a08466','#8f7458','#b2967a'],base:'#9a7e62',rock:'泥岩／粉砂岩',vy:1.6,h:38,cnt:340},
+  clay:{r:[0.6,1],shape:'round',c:['#6d6a62','#5e5b54','#7d7a70'],base:'#66635b',rock:'頁岩',vy:0.9,h:32,cnt:450},
+  shell:{r:[3,5],shape:'shell',c:['#f4f1e8','#e8e2d0','#ffffff'],base:'#d8d0bb',rock:'石灰岩（含化石）',vy:2.2,h:42,cnt:70}
+};
+let layers=[],falling=[],building=null,comp=1,phase='idle',cem=0;
+const stepEls=document.querySelectorAll('#sedSteps span');
+const START_MSG='👆 先加入幾層沉積物（建議 3 至 5 層），再按「壓實、膠結、岩化」。留意：<b>顆粒愈大，沉積得愈快</b>。';
+function setSteps(arr){stepEls.forEach((s,i)=>s.classList.toggle('on',arr.includes(i)));}
+function msg(t){document.getElementById('sedMsg').innerHTML=t;}
+function surfaceY(){return BOT-layers.reduce((a,L)=>a+L.h*comp,0);}
+function addLayer(t){
+  if(building)return;
+  if(phase!=='idle'){msg('岩石已經形成，請按「重設」再試。');return;}
+  if(layers.length>=6){msg('已有 6 層，請按「壓實、膠結、岩化」。');return;}
+  const T=TYPES[t];building={T,h:0,H:T.h,parts:[],spawned:0,landed:0,type:t};layers.push(building);
+  setSteps([0,1]);msg('① 岩石經<b>風化和侵蝕</b>，產生鬆散碎屑和顆粒；② 通過<b>搬運作用</b>被河流搬運到湖泊或淺水海域……');}
+function compact(){
+  if(building||phase!=='idle')return;
+  if(layers.length<2){msg('請先加入至少 2 層沉積物。');return;}
+  phase='compact';setSteps([3]);msg('④ <b>壓實作用</b>：沉積物一層一層的堆積起來，重量把下層的沉積物壓實……');}
+function resetSed(){layers=[];falling=[];building=null;comp=1;phase='idle';cem=0;setSteps([]);msg(START_MSG);}
+function drawShell(x,y,r,c){sx.fillStyle=c;sx.strokeStyle='#9a917c';sx.lineWidth=1;sx.beginPath();sx.arc(x,y,r,Math.PI,0);sx.closePath();sx.fill();sx.stroke();
+  sx.beginPath();sx.moveTo(x,y);sx.lineTo(x-r*0.5,y-r*0.8);sx.moveTo(x,y);sx.lineTo(x+r*0.5,y-r*0.8);sx.stroke();}
+function drawAng(x,y,r,c,a){sx.save();sx.translate(x,y);sx.rotate(a);sx.fillStyle=c;sx.beginPath();
+  sx.moveTo(r,0);sx.lineTo(-r*0.6,r*0.8);sx.lineTo(-r*0.8,-r*0.5);sx.lineTo(r*0.2,-r);sx.closePath();sx.fill();sx.restore();}
+function drawP(shape,x,y,r,c,a){
+  if(shape==='shell')drawShell(x,y,r,c);
+  else if(shape==='ang')drawAng(x,y,r,c,a);
+  else{sx.fillStyle=c;sx.beginPath();sx.arc(x,y,r,0,7);sx.fill();}}
+function sedLoop(){
+  if(building&&building.spawned<building.T.cnt){const T=building.T,n=Math.ceil(T.cnt/50);
+    for(let i=0;i<n&&building.spawned<T.cnt;i++){building.spawned++;
+      falling.push({x:rand(20,SW-20),y:WATER-rand(0,30),vx:rand(-0.4,0.4),vy:T.vy*rand(0.7,1.3),r:rand(T.r[0],T.r[1]),a:rand(0,6.28),c:T.c[Math.floor(Math.random()*T.c.length)],L:building});}}
+  const top=surfaceY();
+  falling=falling.filter(p=>{p.y+=p.vy;p.x+=p.vx;
+    if(p.y>=top){p.L.parts.push({fx:Math.min(SW-4,Math.max(4,p.x)),fy:Math.random(),r:p.r,a:p.a,c:p.c});p.L.landed++;p.L.h=p.L.H*p.L.landed/p.L.T.cnt;return false;}return true;});
+  if(building&&building.landed>=building.T.cnt){building=null;setSteps([2]);msg('③ <b>沉積作用</b>：沉積物在湖泊、沿河流或淺水海域裏沉積成一層。可以再加另一種沉積物，形成不同岩層。');}
+  if(phase==='compact'){comp-=0.003;if(comp<=0.62){comp=0.62;phase='cement';setSteps([4]);msg('⑤ <b>膠結作用</b>：溶於水中的礦物，把鬆散的沉積物膠結在一起……');}}
+  else if(phase==='cement'){cem+=0.005;if(cem>=1){cem=1;phase='lith';setSteps([5]);
+    const hasShell=layers.some(L=>L.type==='shell');
+    msg('⑥ <b>岩化作用</b>：鬆散的沉積物轉變成堅固的岩石！留意岩層之間的<b>層理</b>。'+(hasShell?'<br>🐚 貝殼殘骸形成的石灰岩屬<b>由生物作用形成的非碎屑沉積岩</b>，可能含有化石。':''));}}
+  sx.fillStyle='#cfe8f7';sx.fillRect(0,0,SW,WATER);
+  const g=sx.createLinearGradient(0,WATER,0,SH);g.addColorStop(0,'#8cc4e8');g.addColorStop(1,'#3d7aa8');sx.fillStyle=g;sx.fillRect(0,WATER,SW,SH-WATER);
+  sx.fillStyle='#333';sx.font='18px sans-serif';sx.fillText('🏞️ 河流把沉積物搬運到湖泊／淺水海域',10,26);
+  let y=BOT;
+  layers.forEach(L=>{const h=L.h*comp,t=y-h;
+    sx.fillStyle=L.T.base;sx.globalAlpha=Math.min(1,0.5+0.2*(1-comp)/0.38+0.3*cem);sx.fillRect(0,t,SW,h);sx.globalAlpha=1;
+    sx.save();sx.beginPath();sx.rect(0,t,SW,h);sx.clip();
+    L.parts.forEach(p=>drawP(L.T.shape,p.fx,t+p.fy*h+(L.T.shape==='shell'?p.r/2:0),p.r,p.c,p.a));
+    sx.restore();
+    if(comp<1){sx.strokeStyle='#3b2a1a';sx.lineWidth=2;sx.beginPath();sx.moveTo(0,t);sx.lineTo(SW,t);sx.stroke();}
+    if(phase==='lith'&&h>12){sx.font='bold 20px sans-serif';sx.fillStyle='#fff';sx.strokeStyle='#000';sx.lineWidth=4;sx.textAlign='center';
+      sx.strokeText(L.T.rock,SW/2,t+h/2+7);sx.fillText(L.T.rock,SW/2,t+h/2+7);sx.textAlign='left';}
+    y=t;});
+  if(phase==='cement'){sx.fillStyle='rgba(210,245,255,0.95)';const st=surfaceY();
+    for(let i=0;i<40;i++)sx.fillRect(rand(0,SW),rand(st,BOT),3,3);
+    sx.font='bold 18px sans-serif';sx.fillStyle='#0b4f7a';sx.fillText('💧 溶於水中的礦物把顆粒膠結',SW/2-120,st-10);}
+  falling.forEach(p=>drawP(p.L.T.shape,p.x,p.y,p.r,p.c,p.a));
+  if(phase==='compact'){sx.fillStyle='#c0392b';const top2=surfaceY();
+    for(let i=1;i<6;i++){const ax=SW*i/6;sx.beginPath();sx.moveTo(ax-10,top2-40);sx.lineTo(ax+10,top2-40);sx.lineTo(ax+10,top2-22);sx.lineTo(ax+18,top2-22);sx.lineTo(ax,top2-4);sx.lineTo(ax-18,top2-22);sx.lineTo(ax-10,top2-22);sx.fill();}
+    sx.font='bold 18px sans-serif';sx.fillText('上層沉積物的重量',SW/2-75,top2-48);}
+  requestAnimationFrame(sedLoop);}
+resetSed();sedLoop();
+
+/* ---------- 蒸發（化學沉澱） ---------- */
+const ev=document.getElementById('evCv'),ex=ev.getContext('2d');let evT=0,evAnim=null;
+const evC=[];for(let i=0;i<70;i++)evC.push({x:rand(40,320),y:rand(166,178),s:rand(4,8),c:Math.random()<0.5?'#ffffff':'#f3dede'});
+function drawEv(){
+  ex.fillStyle='#cfe8f7';ex.fillRect(0,0,360,200);
+  ex.fillStyle='#ffd43b';ex.beginPath();ex.arc(320,32,20,0,7);ex.fill();
+  ex.fillStyle='#8a6a4f';ex.fillRect(20,60,320,130);
+  ex.fillStyle='#d6c3a5';ex.fillRect(30,60,300,120);
+  const lvl=110*(1-evT);ex.fillStyle='#5aa9d6';ex.fillRect(30,180-lvl,300,lvl);
+  const n=Math.floor(evT*evC.length);
+  for(let i=0;i<n;i++){const c=evC[i];ex.fillStyle=c.c;ex.fillRect(c.x,c.y,c.s,c.s);ex.strokeStyle='#bbb';ex.strokeRect(c.x,c.y,c.s,c.s);}
+  ex.font='bold 16px sans-serif';ex.fillStyle='#333';
+  ex.fillText(evT<0.95?'鹽水水體':'化學沉澱：石膏、岩鹽',35,55);
+  if(evT>0&&evT<1){ex.fillStyle='#2d8fc4';for(let i=0;i<5;i++)ex.fillText('〰',60+i*55,170-lvl-8-((evT*400+i*10)%20));}}
+function evap(){if(evAnim)cancelAnimationFrame(evAnim);evT=0;
+  const st=()=>{evT=Math.min(1,evT+0.004);drawEv();if(evT<1)evAnim=requestAnimationFrame(st);};st();}
+drawEv();
+
+/* ================= 變質岩 ================= */
+const mv=document.getElementById('metCv'),mx=mv.getContext('2d'),MW=mv.width,MH=mv.height,TOP=55,BTM=MH-55;
+const PARENTS={
+  shale:{bg:'#55524d',pal:['#5a5a5a','#6b6b6b','#4a4a4a','#8a8a80','#c9c9c0'],light:'#e8e2d6',dark:'#262626',sz:1},
+  limestone:{bg:'#c9c2b0',pal:['#d8d4c8','#cfc9b8','#e8e4da','#bdb6a3'],hot:'#fbfbf8',sz:1},
+  sandstone:{bg:'#c8a46a',pal:['#d9b57a','#c9a062','#e3c897','#b8925a'],hot:'#efe6d6',sz:1},
+  coal:{bg:'#2a2622',pal:['#3a332c','#2e2924','#4a4038','#1e1b18'],hot:'#0b0b10',sz:0.45}
+};
+let parent='shale',grains=[];
+function makeGrains(){grains=[];for(let i=0;i<300;i++)grains.push({x:rand(0,MW),y:rand(TOP,BTM),a:rand(0,Math.PI),s:rand(0.7,1.3),c:Math.floor(Math.random()*5)});}
+function setParent(p){parent=p;drawMet();}
+function preset(t,p){document.getElementById('tSl').value=t;document.getElementById('pSl').value=p;drawMet();}
+function metInfo(t,p){const g=(t+p)/2;
+  if(parent==='limestone')return g<0.15?['石灰岩（母岩）','由生物作用形成的沉積岩。調高熱力看看。']:['大理岩','<b>非葉理結構變質岩（中粒）</b>：礦物重新結晶，沒有明顯的排列形式。'];
+  if(parent==='sandstone')return g<0.15?['砂岩（母岩）','由砂粒組成的碎屑沉積岩。']:['石英岩','<b>非葉理結構變質岩（中粒）</b>：礦物重新結晶，非常結實。'];
+  if(parent==='coal')return g<0.15?['煤（母岩）','由植被殘骸形成的沉積岩。']:['無煙煤','<b>非葉理結構變質岩（幼粒）</b>：相比母岩較為結實。'];
+  if(g<0.15)return['頁岩（母岩）','由黏土組成的碎屑沉積岩，礦物排列雜亂。'];
+  if(t>=0.5&&p<0.25)return['角岩','受岩漿<b>熱力</b>影響，礦物重新結晶，屬<b>非葉理結構</b>（因為壓力低，礦物沒有明顯的排列形式）。'];
+  if(g<0.35)return['板岩','<b>葉理結構變質岩（幼粒）</b>：很薄的層理。'];
+  if(g<0.55)return['千枚岩','<b>葉理結構變質岩（幼粒）</b>：帶光澤的表面。'];
+  if(g<0.75)return['片岩','<b>葉理結構變質岩（中粒至粗粒）</b>：扁平或細長的礦物以平行的方式排列。'];
+  return['片麻岩','<b>葉理結構變質岩（中粒至粗粒）</b>：深淺相間的礦物帶。'];}
+function arrow(x,tip,dir,L){mx.beginPath();mx.moveTo(x,tip);mx.lineTo(x-10,tip+dir*12);mx.lineTo(x-4,tip+dir*12);mx.lineTo(x-4,tip+dir*(12+L));mx.lineTo(x+4,tip+dir*(12+L));mx.lineTo(x+4,tip+dir*12);mx.lineTo(x+10,tip+dir*12);mx.closePath();mx.fill();}
+function drawMet(){
+  const t=document.getElementById('tSl').value/100,p=document.getElementById('pSl').value/100;
+  document.getElementById('tVal').textContent=Math.round(t*100);document.getElementById('pVal').textContent=Math.round(p*100);
+  const P=PARENTS[parent],foliated=parent==='shale',mid=(TOP+BTM)/2,sq=1-0.18*p;
+  mx.fillStyle='#f6f3ee';mx.fillRect(0,0,MW,MH);
+  const top=mid-(mid-TOP)*sq,bot=mid+(BTM-mid)*sq;
+  mx.fillStyle=P.bg;mx.fillRect(0,top,MW,bot-top);
+  mx.save();mx.beginPath();mx.rect(0,top,MW,bot-top);mx.clip();
+  const band=foliated?Math.max(0,Math.min(1,((t+p)/2-0.6)/0.3)):0;
+  grains.forEach(g=>{const y=mid+(g.y-mid)*sq,size=(3+7*t)*g.s*P.sz,e=foliated?1+2.4*p:1,ang=foliated?g.a*(1-p):g.a;
+    let col=P.pal[g.c%P.pal.length];
+    if(foliated&&band>0)col=mix(col,Math.sin(y/16)>0?P.light:P.dark,band*0.85);
+    else if(!foliated)col=mix(col,P.hot,t*0.7);
+    mx.fillStyle=col;mx.beginPath();mx.ellipse(g.x,y,size*Math.pow(e,0.7),size/Math.pow(e,0.5),ang,0,Math.PI*2);mx.fill();
+    if(!foliated&&parent!=='coal'&&t>0.3){mx.strokeStyle='rgba(0,0,0,0.25)';mx.lineWidth=1;mx.stroke();}});
+  if(t>0){const hg=mx.createLinearGradient(0,bot,0,top);hg.addColorStop(0,`rgba(255,60,0,${0.4*t})`);hg.addColorStop(1,'rgba(255,60,0,0)');mx.fillStyle=hg;mx.fillRect(0,top,MW,bot-top);}
+  mx.restore();
+  if(p>0.03){mx.fillStyle='#2c3e80';const L=10+30*p;
+    for(let i=1;i<5;i++){const ax=MW*i/5;arrow(ax,top-4,-1,L);arrow(ax,bot+4,1,L);}
+    mx.font='bold 16px sans-serif';mx.fillText('壓力 ⬇',8,18);mx.fillText('壓力 ⬆',8,MH-6);}
+  if(t>0){mx.font='bold 16px sans-serif';mx.fillStyle='#c0392b';mx.fillText('🔥 熱力',MW-80,MH-6);}
+  const [nm,ds]=metInfo(t,p);document.getElementById('metName').textContent=nm;
+  document.getElementById('metDesc').innerHTML=ds+(foliated&&p>0.3?'<br>👀 留意：礦物以<b>大致垂直於擠壓力的方向</b>重新排列。':'');}
+document.getElementById('tSl').oninput=drawMet;document.getElementById('pSl').oninput=drawMet;
+makeGrains();drawMet();
+
+/* ================= 小測 ================= */
+const QS=[
+ ['花崗岩晶體粗大的主要原因是：',['熔岩在地表冷卻速度快','岩漿在地殼深處冷卻速度慢','沉積物被壓實','岩石受擠壓力影響'],1,'岩漿在地殼深處冷卻速度慢，礦物有足夠時間聚合，所以晶體粗大。'],
+ ['以下哪一種屬於噴出岩（火山岩）？',['花崗岩','輝長岩','凝灰岩','大理岩'],2,'噴出岩例子：流紋岩、凝灰岩、玄武岩。花崗岩、輝長岩屬侵入岩（深成岩）。'],
+ ['火成岩不含化石，是因為：',['火成岩形成時間太短','岩漿或熔岩的高溫會破壞動植物殘骸','火成岩只在海底形成','火成岩沒有晶體'],1,'岩漿或熔岩的高溫會破壞動植物殘骸。'],
+ ['火成岩的顏色較淺，表示它：',['二氧化硅含量較高','二氧化硅含量較低','冷卻速度較快','含有化石'],0,'二氧化硅含量愈高，岩石的顏色愈淺，例如流紋岩、花崗岩。'],
+ ['鬆散的沉積物轉變成堅固的岩石，稱為：',['風化作用','搬運作用','岩化作用','變質作用'],2,'鬆散的沉積物轉變成堅固的岩石，造成岩化作用。'],
+ ['含菱角顆粒的碎屑沉積岩是：',['礫岩','角礫岩','砂岩','頁岩'],1,'礫岩含渾圓顆粒；角礫岩含菱角顆粒。'],
+ ['由黏土形成的碎屑沉積岩是：',['砂岩','泥岩','頁岩','礫岩'],2,'黏土 → 頁岩；粉砂 → 泥岩和粉砂岩；砂粒 → 砂岩。'],
+ ['煤屬於：',['碎屑沉積岩','由化學作用形成的非碎屑沉積岩','由生物作用形成的非碎屑沉積岩','火成岩'],2,'植被殘骸遭淹埋在沼澤裏，經長期積壓形成煤。'],
+ ['石灰岩受岩漿熱力影響形成大理岩，屬於：',['動力變質作用','熱力／接觸變質作用','區域變質作用','岩化作用'],1,'岩漿侵入，在接觸帶的熱力使岩石溫度上升，礦物重新結晶。'],
+ ['區域變質作用中，礦物以甚麼方向重新排列？',['大致平行於擠壓力','大致垂直於擠壓力','沒有固定方向','垂直於地表'],1,'礦物重新結晶，並以大致垂直於擠壓力的方向重新排列。'],
+ ['以下哪一種屬於葉理結構變質岩？',['大理岩','石英岩','片麻岩','無煙煤'],2,'葉理結構變質岩：板岩、千枚岩、片岩、片麻岩。'],
+ ['有關動力變質作用，以下哪項正確？',['岩石的礦物成分大幅改變','岩石沿斷層面位移產生高壓，導致岩石碎裂','由岩漿的熱力引起','只在聚合性板塊邊界的造山帶發生'],1,'動力變質作用中，岩石的礦物成分只有很少或完全沒有變化。']
+];
+let score=0,answered=0;
+function buildQuiz(){score=0;answered=0;updScore();const box=document.getElementById('quizBox');box.innerHTML='';
+  QS.forEach((q,i)=>{const d=document.createElement('div');d.className='card q';
+    d.innerHTML=`<b>${i+1}. ${q[0]}</b>`+q[1].map((o,j)=>`<button data-j="${j}">${'ABCD'[j]}. ${o}</button>`).join('')+`<div class="exp">💡 ${q[3]}</div>`;
+    d.querySelectorAll('button').forEach(b=>b.onclick=()=>{if(d.dataset.done)return;d.dataset.done=1;answered++;
+      const j=+b.dataset.j;if(j===q[2]){score++;b.classList.add('right');}else{b.classList.add('wrong');d.querySelectorAll('button')[q[2]].classList.add('right');}
+      d.querySelector('.exp').style.display='block';updScore();});
+    box.appendChild(d);});}
+function updScore(){document.getElementById('score').textContent=`得分：${score} / ${answered}（共 ${QS.length} 題）`;}
+buildQuiz();
+</script>
+</body>
+</html>
