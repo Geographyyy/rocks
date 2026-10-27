@@ -452,36 +452,99 @@ function mix(a,b,f){const A=hexRgb(a),B=hexRgb(b);return `rgb(${A.map((v,i)=>Mat
 function pickW(list){let s=list.reduce((a,b)=>a+b[1],0),r=Math.random()*s;for(const it of list){r-=it[1];if(r<=0)return it[0];}return list[0][0];}
 function rand(a,b){return a+Math.random()*(b-a);}
 
-/* ================= 岩石循環 ================= */
+/* ================= 岩石循環（新版） ================= */
 const N={
-  ig:{x:130,y:230,t:'火成岩',c:'#d9534f',page:'igneous',info:'由岩漿或熔岩<b>冷卻和凝固</b>而成。分為<b>噴出岩（火山岩）</b>及<b>侵入岩（深成岩）</b>。'},
-  sd:{x:400,y:70,t:'沉積物',c:'#b08d57',info:'岩石經<b>風化和侵蝕</b>後產生的鬆散碎屑和顆粒，例如礫石、砂粒、粉砂、黏土。'},
-  se:{x:670,y:230,t:'沉積岩',c:'#e0a526',page:'sedimentary',info:'沉積物經<b>沉積作用、壓實作用、膠結作用及岩化作用</b>而成，具有層理，可能含有化石。'},
-  me:{x:560,y:460,t:'變質岩',c:'#5b6abf',page:'metamorphic',info:'母岩受<b>壓力</b>及／或<b>熱力</b>影響，礦物重新結晶或重新排列而成。'},
-  ma:{x:240,y:460,t:'岩漿',c:'#e8590c',info:'地殼深處熔融的岩石。岩漿到達地表後稱為<b>熔岩</b>。'}
+  ma:{t:'岩漿',shape:'ell',x:345,y:35,rx:58,ry:24,c:'#e8590c',info:'地殼深處熔融的岩石。岩漿到達地表後稱為<b>熔岩</b>。'},
+  ig:{t:'火成岩',shape:'rect',x:5,y:190,w:165,h:60,c:'#d9534f',page:'igneous',info:'由岩漿或熔岩<b>冷卻和凝固</b>而成。分為<b>噴出岩（火山岩）</b>及<b>侵入岩（深成岩）</b>。'},
+  me:{t:'變質岩',shape:'rect',x:520,y:193,w:165,h:60,c:'#5b6abf',page:'metamorphic',info:'母岩受<b>高温和（或）高壓</b>影響，礦物重新結晶或重新排列而成。'},
+  se:{t:'沉積岩',shape:'rect',x:467,y:437,w:168,h:60,c:'#e0a526',page:'sedimentary',info:'沉積物經<b>沉積作用、壓實作用、膠結作用和岩化作用</b>而成，具有層理，可能含有化石。'},
+  sd:{t:'沉積物',shape:'ell',x:130,y:467,rx:50,ry:24,c:'#8d7b68',info:'岩石經<b>剝蝕作用</b>（風化和侵蝕）後產生的鬆散碎屑和顆粒，例如礫石、砂粒、粉砂、黏土。'}
+};
+const LB={
+  magIg:{x:150,y:90,r:0,lines:['火山作用、','冷卻、凝固作用','和結晶作用']},
+  meltC:{x:345,y:170,r:1,lines:['熔融']},
+  meltR:{x:548,y:110,r:3,lines:['熔融']},
+  hpC:{x:345,y:272,r:4,lines:['高温和','（或）高壓']},
+  erL:{x:75,y:373,r:5,lines:['剝蝕作用']},
+  erC:{x:345,y:373,r:6,lines:['剝蝕作用']},
+  hpR:{x:612,y:373,r:9,lines:['高温和（或）高壓']},
+  dep:{x:345,y:558,r:8,lines:['沉積作用、壓實作用、','膠結作用和岩化作用']}
 };
 const E=[
-  ['ma','ig','冷卻和凝固','out',40,'・岩漿在<b>地殼內</b>冷卻和凝固 → <b>侵入岩（深成岩）</b>，例如花崗岩、輝長岩<br>・熔岩或其他火山物質在<b>地表</b>冷卻和凝固 → <b>噴出岩（火山岩）</b>，例如流紋岩、凝灰岩、玄武岩'],
-  ['ig','sd','風化、侵蝕、搬運','out',40,'岩石外露於地表，經<b>風化和侵蝕</b>，產生鬆散碎屑和顆粒，再通過<b>搬運作用</b>被搬運到山坡下、河流、湖泊或淺水海域。'],
-  ['sd','se','沉積、壓實、膠結','out',40,'沉積物在湖泊、沿河流或淺水海域裏沉積（<b>沉積作用</b>）→ 一層一層堆積，重量把下層壓實（<b>壓實作用</b>）→ 溶於水中的礦物把沉積物膠結在一起（<b>膠結作用</b>）→ 轉變成堅固的岩石（<b>岩化作用</b>）。'],
-  ['se','me','變質作用','out',40,'沉積岩受<b>熱力</b>及／或<b>壓力</b>影響，礦物重新結晶或重新排列，形成變質岩。<br>例：石灰岩 → 大理岩（熱力／接觸變質作用）<br>　　頁岩 → 板岩 → 片岩 → 片麻岩（區域變質作用）'],
-  ['me','ma','熔融','out',40,'在地殼深處或聚合性板塊邊界，溫度持續上升，岩石完全<b>熔融</b>，成為岩漿。'],
-  ['ig','me','變質作用','in',35,'火成岩同樣可以受熱力和壓力影響而<b>變質</b>。<br>例：花崗岩 → 片麻岩。'],
-  ['se','sd','抬升、風化','in',40,'沉積岩被地殼運動<b>抬升</b>至地表，再次受風化和侵蝕，變回沉積物。'],
-  ['me','sd','抬升、風化','in',30,'變質岩被地殼運動<b>抬升</b>並外露於地表，同樣會受風化和侵蝕，變回沉積物。']
+  {a:'ma',b:'ig',lb:'magIg',p:['M292,40 Q220,50 185,72','M128,142 Q105,162 98,186'],
+   info:'岩漿經<b>火山作用、冷卻、凝固作用和結晶作用</b>形成火成岩：<br>・岩漿在<b>地殼內</b>冷卻和凝固 → <b>侵入岩（深成岩）</b>，例如花崗岩、輝長岩<br>・熔岩或其他火山物質在<b>地表</b>冷卻和凝固 → <b>噴出岩（火山岩）</b>，例如流紋岩、凝灰岩、玄武岩'},
+  {a:'ig',b:'ma',lb:'meltC',p:['M172,212 C230,215 280,200 322,176','M345,150 L345,62'],
+   info:'火成岩被帶到地殼深處（例如在聚合性板塊邊界），溫度持續上升，岩石完全<b>熔融</b>，重新成為岩漿。'},
+  {a:'se',b:'ma',lb:'meltC',p:['M528,436 C520,300 470,200 372,173','M345,150 L345,62'],
+   info:'沉積岩被帶到地殼深處，溫度持續上升，岩石完全<b>熔融</b>，成為岩漿。'},
+  {a:'me',b:'ma',lb:'meltR',p:['M592,191 Q578,150 560,122','M535,92 Q490,50 402,30'],
+   info:'變質岩所受溫度繼續上升，岩石完全<b>熔融</b>，成為岩漿，重新進入岩石循環。'},
+  {a:'ig',b:'me',lb:'hpC',p:['M172,232 Q220,268 298,278','M395,278 Q470,268 518,238'],
+   info:'火成岩受<b>高温和（或）高壓</b>影響，礦物重新結晶或重新排列，形成變質岩。<br>例：花崗岩 → 片麻岩'},
+  {a:'ig',b:'sd',lb:'erL',p:['M75,252 Q66,300 72,350','M85,382 Q92,420 118,442'],
+   info:'火成岩外露於地表，經<b>剝蝕作用</b>（風化和侵蝕）產生鬆散碎屑和顆粒，再通過<b>搬運作用</b>被搬運到山坡下、河流、湖泊或淺水海域，成為沉積物。'},
+  {a:'me',b:'sd',lb:'erC',p:['M558,255 Q520,345 400,366','M300,378 Q230,400 172,452'],
+   info:'變質岩被地殼運動抬升並外露於地表，經<b>剝蝕作用</b>（風化和侵蝕）變成沉積物。'},
+  {a:'se',b:'sd',lb:'erC',p:['M492,436 Q440,388 402,374','M300,378 Q230,400 172,452'],
+   info:'沉積岩被地殼運動抬升至地表，再次經<b>剝蝕作用</b>（風化和侵蝕）變回沉積物。'},
+  {a:'sd',b:'se',lb:'dep',p:['M160,488 Q220,535 255,550','M435,550 Q492,530 522,500'],
+   info:'沉積物在湖泊、沿河流或淺水海域裏沉積（<b>沉積作用</b>）→ 一層一層堆積，重量把下層壓實（<b>壓實作用</b>）→ 溶於水中的礦物把沉積物膠結在一起（<b>膠結作用</b>）→ 轉變成堅固的岩石（<b>岩化作用</b>）。'},
+  {a:'se',b:'me',lb:'hpR',p:['M602,436 Q612,410 612,388','M612,352 Q612,300 610,258'],
+   info:'沉積岩受<b>高温和（或）高壓</b>影響，礦物重新結晶或重新排列，形成變質岩。<br>例：石灰岩 → 大理岩；砂岩 → 石英岩<br>　　頁岩 → 板岩 → 千枚岩 → 片岩 → 片麻岩'}
 ];
-const C0={x:400,y:290};
-function edgeGeo(a,b,dir,k){
-  const A=N[a],B=N[b],mx=(A.x+B.x)/2,my=(A.y+B.y)/2,dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy);
-  const px=-dy/L,py=dx/L;let cx=mx+px*k,cy=my+py*k;
-  const isOut=Math.hypot(cx-C0.x,cy-C0.y)>Math.hypot(mx-C0.x,my-C0.y);
-  if((dir==='out')!==isOut){cx=mx-px*k;cy=my-py*k;}
-  const R=54,u=(x,y)=>{const l=Math.hypot(x,y);return[x/l,y/l]};
-  const [ux,uy]=u(cx-A.x,cy-A.y),[vx,vy]=u(cx-B.x,cy-B.y);
-  const sx=A.x+ux*R,sy=A.y+uy*R,ex=B.x+vx*(R+8),ey=B.y+vy*(R+8);
-  return{d:`M${sx},${sy} Q${cx},${cy} ${ex},${ey}`,lx:.25*sx+.5*cx+.25*ex,ly:.25*sy+.5*cy+.25*ey};
-}
+const PLAY=[0,5,8,9,3];
 function buildCycle(){
+  const svg=document.getElementById('cycleSvg');
+  svg.setAttribute('viewBox','0 0 700 590');
+  let s=`<style>
+    .rc-r{cursor:pointer}
+    .rc-r .vis{fill:none;stroke:#000;stroke-width:1.6;marker-end:url(#rcA)}
+    .rc-r:hover .vis{stroke:#e8590c}
+    .rc-r.on .vis{stroke:#e8590c;stroke-width:4;marker-end:url(#rcAOn);stroke-dasharray:12 7;animation:flow .8s linear infinite}
+    .rc-lb{cursor:pointer;font-size:16px;fill:#222;text-anchor:middle}
+    .rc-lb:hover,.rc-lb.on{fill:#e8590c;font-weight:bold}
+    .rc-n{cursor:pointer}
+    .rc-n:hover rect,.rc-n:hover ellipse{stroke:#e8590c;stroke-width:3}
+  </style>
+  <defs>
+    <marker id="rcA" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker>
+    <marker id="rcAOn" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e8590c"/></marker>
+  </defs>`;
+  E.forEach((e,i)=>{
+    s+=`<g class="rc-r" id="edge${i}" onclick="pickEdge(${i})">`+
+      e.p.map(d=>`<path d="${d}" stroke="transparent" stroke-width="22" fill="none"/><path class="vis" d="${d}"/>`).join('')+`</g>`;
+  });
+  s+=`<g id="rcTop"></g>`;
+  for(const k in LB){const L=LB[k];
+    s+=`<text class="rc-lb" id="lb_${k}" x="${L.x}" y="${L.y}" onclick="pickEdge(${L.r})">`+
+      L.lines.map((t,j)=>`<tspan x="${L.x}" dy="${j?22:0}">${t}</tspan>`).join('')+`</text>`;
+  }
+  for(const k in N){const n=N[k];
+    if(n.shape==='rect'){
+      s+=`<g class="rc-n" onclick="pickNode('${k}')"><rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" fill="#fff" stroke="#000" stroke-width="1.2"/><text x="${n.x+n.w/2}" y="${n.y+n.h/2}" text-anchor="middle" dominant-baseline="middle" font-size="22" fill="#d6234a">${n.t}</text></g>`;
+    }else{
+      s+=`<g class="rc-n" onclick="pickNode('${k}')"><ellipse cx="${n.x}" cy="${n.y}" rx="${n.rx}" ry="${n.ry}" fill="#bdbdbd"/><text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="#000">${n.t}</text></g>`;
+    }
+  }
+  svg.innerHTML=s;
+}
+function clearEdge(){document.querySelectorAll('.rc-r.on,.rc-lb.on').forEach(x=>x.classList.remove('on'));}
+function pickEdge(i){
+  clearEdge();const e=E[i],g=document.getElementById('edge'+i);
+  g.classList.add('on');g.parentNode.insertBefore(g,document.getElementById('rcTop'));
+  document.getElementById('lb_'+e.lb).classList.add('on');
+  document.getElementById('cycleInfo').innerHTML=`<h3>${N[e.a].t} ➜ ${N[e.b].t}</h3><p style="font-size:24px;color:#e8590c"><b>${LB[e.lb].lines.join('')}</b></p><p>${e.info}</p>`;
+}
+function pickNode(k){clearEdge();const n=N[k];
+  document.getElementById('cycleInfo').innerHTML=`<h3 style="color:${n.c}">${n.t}</h3><p>${n.info}</p>`+
+    (n.page?`<button class="btn" style="background:${n.c}" onclick="show('${n.page}')">前往「${n.t}」動畫 →</button>`:'');
+}
+let playTimer=null,playIdx=0;
+function togglePlay(){const b=document.getElementById('playBtn');
+  if(playTimer){clearInterval(playTimer);playTimer=null;b.textContent='▶ 自動播放主循環';return;}
+  b.textContent='⏸ 暫停';playIdx=0;pickEdge(PLAY[0]);
+  playTimer=setInterval(()=>{playIdx=(playIdx+1)%PLAY.length;pickEdge(PLAY[playIdx]);},4500);}
+buildCycle();
   let s=`<defs>
    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#888"/></marker>
    <marker id="ahOn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e8590c"/></marker></defs>`;
