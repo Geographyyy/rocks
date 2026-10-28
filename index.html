@@ -399,12 +399,410 @@ ol.flow li{margin-bottom:4px}
       <tr><td><b>例子</b></td><td>花崗岩、輝長岩、流紋岩、凝灰岩、玄武岩</td><td>礫岩、角礫岩、砂岩、泥岩、頁岩、石灰岩、煤</td><td>板岩、千枚岩、片岩、片麻岩、大理岩、石英岩、無煙煤</td></tr>
     </table>
   </div>
-  <div class="card">
-    <h3>🔍 快速辨認</h3>
-    <p>晶體互相緊扣、沒有層理？ → <span class="tag ig">火成岩</span></p>
-    <p>有層理、由顆粒組成、可能有化石？ → <span class="tag sed">沉積岩</span></p>
-    <p>扁平或細長的礦物以平行的方式排列（葉理結構）？ → <span class="tag met">變質岩</span></p>
+ <!-- ===== 快速辨認（圖解＋模擬）開始 ===== -->
+<div id="rid-app">
+<style>
+#rid-app{line-height:1.6;color:#222}
+#rid-app h2{margin:24px 0 8px}
+#rid-app .rid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:10px 0}
+#rid-app .rid-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+#rid-app .rid-card h3{margin:8px 0 4px;font-size:1.1em}
+#rid-app .rid-card ul{margin:4px 0 0 18px;padding:0}
+#rid-app svg{width:100%;height:auto;display:block;border-radius:8px;background:#eee}
+#rid-app .rid-tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.85em;color:#fff}
+#rid-app .rid-ig{background:#d9534f}#rid-app .rid-sed{background:#c8913a}#rid-app .rid-meta{background:#5b6abf}
+#rid-app.rid-nolabel .rid-label{display:none}
+#rid-app .rid-steps{background:#f6f8fb;border-left:5px solid #5b6abf;padding:10px 14px;border-radius:8px;margin:14px 0}
+#rid-app .rid-sim{background:#fff;border:2px solid #5b6abf;border-radius:14px;padding:14px;margin-top:10px}
+#rid-app .rid-views{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:10px 0}
+#rid-app .rid-cap{font-weight:bold;margin-bottom:4px}
+#rid-app button{font-size:1em;padding:8px 14px;border-radius:8px;border:1px solid #888;background:#f3f3f3;cursor:pointer;margin:4px 6px 4px 0;color:#222}
+#rid-app button:disabled{cursor:default;opacity:1}
+#rid-app .rid-choices button{min-width:110px;font-weight:bold}
+#rid-app button.rid-right{background:#4caf50;color:#fff;border-color:#3a8b3d}
+#rid-app button.rid-wrong{background:#e53935;color:#fff;border-color:#b52a27}
+#rid-app #rid-feedback{margin-top:10px;padding:10px 12px;border-radius:8px;display:none}
+#rid-app #rid-feedback.ok{display:block;background:#e8f5e9;border:1px solid #81c784}
+#rid-app #rid-feedback.no{display:block;background:#ffebee;border:1px solid #e57373}
+#rid-app .rid-scene{font-size:1.05em;background:#fffbe6;border-radius:8px;padding:8px 12px}
+</style>
+
+<h2>🔍 快速辨認：睇三樣特徵</h2>
+<label><input type="checkbox" id="rid-toggle" checked> 顯示圖上標示</label>
+
+<div class="rid-cards">
+  <div class="rid-card">
+    <svg id="rid-f1" viewBox="0 0 300 200"></svg>
+    <h3>① 晶體 <span class="rid-tag rid-ig">火成岩</span></h3>
+    <ul>
+      <li>一粒粒<b>有棱有角</b>嘅礦物</li>
+      <li>晶體之間<b>互相緊扣</b>，冇空隙</li>
+      <li>排列<b>冇方向</b>（亂排）</li>
+      <li>例子：花崗岩（大晶體）、玄武岩（細晶體）</li>
+    </ul>
   </div>
+  <div class="rid-card">
+    <svg id="rid-f2" viewBox="0 0 300 200"></svg>
+    <h3>② 層理同層面 <span class="rid-tag rid-sed">沉積岩</span></h3>
+    <ul>
+      <li><b>層理</b>：沉積物一層一層疊起嘅構造</li>
+      <li><b>層面</b>：層與層之間嘅分界面，岩石常沿住呢度裂開</li>
+      <li>有時會見到<b>化石</b></li>
+      <li>例子：砂岩、頁岩、礫岩</li>
+    </ul>
+  </div>
+  <div class="rid-card">
+    <svg id="rid-f3" viewBox="0 0 300 200"></svg>
+    <h3>③ 葉理 <span class="rid-tag rid-meta">變質岩</span></h3>
+    <ul>
+      <li>岩石受<b>高溫高壓</b>，礦物被壓到<b>平行排列</b></li>
+      <li>排列方向同壓力方向<b>垂直</b></li>
+      <li>片岩：閃亮片狀礦物；片麻岩：深淺條帶</li>
+      <li>例子：板岩、片岩、片麻岩</li>
+    </ul>
+  </div>
+</div>
+
+<h3>⚠️ 易混淆：晶體 vs 碎屑顆粒</h3>
+<div class="rid-cards">
+  <div class="rid-card">
+    <svg id="rid-f4" viewBox="0 0 300 200"></svg>
+    <h3>晶體 <span class="rid-tag rid-ig">火成岩</span></h3>
+    <ul><li>岩漿冷卻時<b>結晶</b>而成</li><li>有棱角、互相緊扣、冇空隙</li></ul>
+  </div>
+  <div class="rid-card">
+    <svg id="rid-f5" viewBox="0 0 300 200"></svg>
+    <h3>碎屑顆粒 <span class="rid-tag rid-sed">沉積岩</span></h3>
+    <ul><li>被水沖、搬運而<b>磨圓</b></li><li>顆粒之間有<b>膠結物</b>黏住</li></ul>
+  </div>
+</div>
+
+<div class="rid-steps">
+  <b>📋 三步判斷法</b><br>
+  1️⃣ 有冇層理、化石或者圓滑碎屑？ → 有：<b>沉積岩</b><br>
+  2️⃣ 有晶體，而且亂排、緊扣？ → 係：<b>火成岩</b><br>
+  3️⃣ 有晶體，但平行排列（葉理）？ → 係：<b>變質岩</b><br>
+  <small>＊例外：大理岩係變質岩，但冇葉理（模擬最後一題會考）</small>
+</div>
+
+<h2>🧪 模擬情況：野外考察</h2>
+<div class="rid-sim">
+  <div id="rid-progress"></div>
+  <p class="rid-scene" id="rid-scene"></p>
+  <div class="rid-views">
+    <div><div class="rid-cap">👀 肉眼睇</div><svg id="rid-sample" viewBox="0 0 300 200"></svg></div>
+    <div id="rid-zoomwrap" style="display:none"><div class="rid-cap">🔍 放大鏡下</div><svg id="rid-zoom" viewBox="0 0 300 200"></svg></div>
+  </div>
+  <button type="button" id="rid-zoombtn">🔍 用放大鏡睇</button>
+  <div class="rid-choices">
+    <button type="button" data-a="ig">🔥 火成岩</button>
+    <button type="button" data-a="sed">🏖️ 沉積岩</button>
+    <button type="button" data-a="meta">🗜️ 變質岩</button>
+  </div>
+  <div id="rid-feedback"></div>
+  <button type="button" id="rid-next" style="display:none">下一題 ➜</button>
+</div>
+</div>
+
+<script>
+(function(){
+var NS='http://www.w3.org/2000/svg',W=300,H=200,uid=0;
+function $(id){return document.getElementById(id);}
+function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs){e.setAttribute(k,attrs[k]);}if(parent){parent.appendChild(e);}return e;}
+function clear(svg){while(svg.firstChild){svg.removeChild(svg.firstChild);}}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,a){return a[Math.floor(r()*a.length)];}
+function wpick(r,list){var sum=0,i;for(i=0;i<list.length;i++){sum+=list[i][1];}var x=r()*sum;for(i=0;i<list.length;i++){x-=list[i][1];if(x<=0){return list[i][0];}}return list[0][0];}
+function f1(n){return (+n).toFixed(1);}
+function poly(pts){return pts.map(function(p){return f1(p[0])+','+f1(p[1]);}).join(' ');}
+function line(pts){return 'M'+pts.map(function(p){return f1(p[0])+','+f1(p[1]);}).join(' L');}
+function wav(y,amp,k,ph){var pts=[];for(var x=-10;x<=W+10;x+=10){pts.push([x,y+amp*Math.sin(x*k+ph)]);}return pts;}
+
+/* 晶體：互相緊扣嘅多邊形 */
+function mesh(g,r,cell,colorFn,stroke){
+  var cols=Math.ceil(W/cell)+2,rows=Math.ceil(H/cell)+2,P=[],out=[],i,j;
+  for(i=0;i<=rows;i++){P[i]=[];for(j=0;j<=cols;j++){P[i][j]=[(j-1)*cell+(r()-.5)*cell*.7,(i-1)*cell+(r()-.5)*cell*.7];}}
+  for(i=0;i<rows;i++){for(j=0;j<cols;j++){
+    var a=P[i][j],b=P[i][j+1],c=P[i+1][j+1],d=P[i+1][j],parts;
+    if(r()<.5){parts=[[a,b,c,d]];}else if(r()<.5){parts=[[a,b,c],[a,c,d]];}else{parts=[[a,b,d],[b,c,d]];}
+    parts.forEach(function(pp){
+      var f=colorFn(r);
+      el('polygon',{points:poly(pp),fill:f,stroke:stroke,'stroke-width':.7,'stroke-linejoin':'round'},g);
+      var cx=0,cy=0;pp.forEach(function(p){cx+=p[0];cy+=p[1];});
+      out.push({pts:pp,cx:cx/pp.length,cy:cy/pp.length});
+    });
+  }}
+  return out;
+}
+
+/* 分層：層理／條帶 */
+function layered(g,r,s,o){
+  var b=[],y=-4,ph=r()*6,i,j,prev=-1;
+  while(y<H+4){b.push(wav(y,o.amp*s,o.k/s,o.same?ph:r()*6));y+=o.th*s*(0.6+r()*0.8);}
+  b.push(wav(H+30,0,0,0));
+  for(i=0;i<b.length-1;i++){
+    var ci;
+    if(o.alt){ci=i%o.colors.length;}else{do{ci=Math.floor(r()*o.colors.length);}while(ci===prev&&o.colors.length>1);}
+    prev=ci;
+    el('path',{d:line(b[i])+' L'+line(b[i+1].slice().reverse()).slice(1)+' Z',fill:o.colors[ci]},g);
+    if(o.grain){
+      var n=Math.round(o.density*(b[i+1][16][1]-b[i][16][1])/10);
+      for(j=0;j<n;j++){
+        var x=r()*W,idx=Math.round((x+10)/10),t=b[i][idx][1],bt=b[i+1][idx][1];
+        el('circle',{cx:f1(x),cy:f1(t+r()*(bt-t)),r:((o.grain[0]+r()*(o.grain[1]-o.grain[0]))*s).toFixed(2),fill:pick(r,o.grainColors)},g);
+      }
+    }
+  }
+  if(o.lineColor){for(i=1;i<b.length-1;i++){el('path',{d:line(b[i]),fill:'none',stroke:o.lineColor,'stroke-width':o.lw||1},g);}}
+  return {b:b,ph:ph};
+}
+
+/* 葉理：平行排列嘅片狀礦物 */
+function flakes(g,r,s,n,A,K,ph,colors,len){
+  for(var i=0;i<n;i++){
+    var x=r()*W,y=r()*H,ang=Math.atan(A*K*Math.cos(x*K+ph))*180/Math.PI,rx=len*(0.6+r()*0.8)*s;
+    el('ellipse',{cx:f1(x),cy:f1(y),rx:f1(rx),ry:f1(0.9*s),fill:pick(r,colors),opacity:0.85,transform:'rotate('+f1(ang)+' '+f1(x)+' '+f1(y)+')'},g);
+  }
+}
+
+/* 碎屑：圓滑石仔 */
+function pebbles(g,r,s,colors){
+  var list=[],tries=0,target=Math.round(26/(s*s))+3;
+  while(list.length<target&&tries<800){
+    tries++;
+    var rx=(6+r()*10)*s,ry=rx*(0.6+r()*0.35),x=r()*W,y=r()*H,ok=true;
+    for(var i=0;i<list.length;i++){if(Math.hypot(x-list[i].x,y-list[i].y)<rx+list[i].rx*0.9+3){ok=false;break;}}
+    if(!ok){continue;}
+    var tf='rotate('+f1(r()*60-30)+' '+f1(x)+' '+f1(y)+')';
+    el('ellipse',{cx:f1(x),cy:f1(y),rx:f1(rx),ry:f1(ry),fill:pick(r,colors),stroke:'#3b2a22','stroke-width':0.9,transform:tf},g);
+    el('ellipse',{cx:f1(x-rx*0.3),cy:f1(y-ry*0.35),rx:f1(rx*0.35),ry:f1(ry*0.25),fill:'#fff',opacity:0.25,transform:tf},g);
+    list.push({x:x,y:y,rx:rx});
+  }
+  return list;
+}
+
+var TEX={
+  granite:function(g,r,s){return mesh(g,r,22*s,function(r){return wpick(r,[['#ece9e2',3],['#cfcac2',2],['#e6b5a1',3],['#d4927c',1],['#262626',1.6]]);},'#6b625a');},
+  basalt:function(g,r,s){
+    mesh(g,r,5*s,function(r){return wpick(r,[['#4b4e52',3],['#3b3d40',3],['#62666a',2],['#26272a',1]]);},'#2c2e30');
+    for(var i=0;i<16;i++){el('circle',{cx:f1(r()*W),cy:f1(r()*H),r:f1((2+r()*4)*s),fill:'#141414',stroke:'#777','stroke-width':0.6},g);}
+  },
+  marble:function(g,r,s){return mesh(g,r,11*s,function(r){return wpick(r,[['#f7f6f2',3],['#ebece8',3],['#dfe1de',2],['#f2eee4',1]]);},'#b7bab6');},
+  shale:function(g,r,s){return layered(g,r,s,{th:6,amp:0.8,k:0.02,colors:['#8e908d','#76797a','#a09f99','#666868'],grain:[0.3,0.7],grainColors:['#555','#bbb'],density:8,lineColor:'#3f4040',lw:0.8});},
+  conglomerate:function(g,r,s){
+    layered(g,r,s,{th:45,amp:1,k:0.02,colors:['#b4644a','#a75a41','#bf7458'],grain:[0.6,1.4],grainColors:['#7d3a28','#e0a58c'],density:40,lineColor:'#7a3b2a'});
+    return pebbles(g,r,s,['#e7e0d3','#9a9a94','#5c5c5a','#d8c7a6','#7f6a58','#c9b7a0']);
+  },
+  gneiss:function(g,r,s){
+    var res=layered(g,r,s,{th:13,amp:9,k:0.025,same:true,alt:true,colors:['#e8e3da','#3c3c3f','#c4bcb0','#2e2e31','#efe9df','#8a8178']});
+    flakes(g,r,s,Math.round(450/(s*s)),9*s,0.025/s,res.ph,['#1e1e21','#f4f0e9','#8f877c'],4);
+    return res;
+  },
+  schist:function(g,r,s){
+    var res=layered(g,r,s,{th:9,amp:6,k:0.03,same:true,alt:true,colors:['#aab1ac','#99a09b','#b9beb7','#8d948f']});
+    flakes(g,r,s,Math.round(900/(s*s)),6*s,0.03/s,res.ph,['#2c302e','#eef1ec','#6f7672','#d3dad5'],3.5);
+    for(var i=0;i<Math.round(8/s)+2;i++){el('circle',{cx:f1(r()*W),cy:f1(r()*H),r:f1(2.6*s),fill:'#8c2b2b',stroke:'#4a1212','stroke-width':0.6},g);}
+    return res;
+  }
+};
+
+/* 標示 */
+function lg(svg){return el('g',{'class':'rid-label'},svg);}
+function box(g,x,y,text){
+  var w=text.length*12.5+14;
+  el('rect',{x:f1(x-w/2),y:f1(y-11),width:f1(w),height:22,rx:6,fill:'#fff','fill-opacity':0.93,stroke:'#333'},g);
+  var t=el('text',{x:f1(x),y:f1(y+4.5),'text-anchor':'middle','font-size':12.5,'font-weight':'bold',fill:'#111'},g);t.textContent=text;
+}
+function label(g,tx,ty,x,y,text){
+  el('line',{x1:f1(tx),y1:f1(ty),x2:f1(x),y2:f1(y),stroke:'#111','stroke-width':3.5},g);
+  el('line',{x1:f1(tx),y1:f1(ty),x2:f1(x),y2:f1(y),stroke:'#ffd400','stroke-width':2},g);
+  el('circle',{cx:f1(x),cy:f1(y),r:4,fill:'#ffd400',stroke:'#111','stroke-width':1.2},g);
+  box(g,tx,ty,text);
+}
+function arrow(g,x,y1,y2,color){
+  var dir=y2>y1?1:-1;
+  el('line',{x1:x,y1:y1,x2:x,y2:y2-dir*8,stroke:color,'stroke-width':5},g);
+  el('polygon',{points:poly([[x-9,y2-dir*10],[x+9,y2-dir*10],[x,y2]]),fill:color},g);
+}
+function shell(g,x,y,sz){
+  el('path',{d:'M'+f1(x-sz)+','+f1(y)+' A'+f1(sz)+','+f1(sz)+' 0 0 1 '+f1(x+sz)+','+f1(y)+' Z',fill:'#f1e7cc',stroke:'#5a4a30','stroke-width':1.2},g);
+  for(var a=20;a<=160;a+=20){var rad=a*Math.PI/180;el('line',{x1:f1(x),y1:f1(y),x2:f1(x-Math.cos(rad)*sz),y2:f1(y-Math.sin(rad)*sz),stroke:'#8a7550','stroke-width':0.8},g);}
+  el('rect',{x:f1(x-3),y:f1(y),width:6,height:4,fill:'#c9b98f',stroke:'#5a4a30','stroke-width':0.8},g);
+}
+function nearest(list,x,y){
+  var best=null,bd=1e9;
+  list.forEach(function(c){var d=Math.hypot(c.cx-x,c.cy-y);if(c.pts.length===4&&d<bd){bd=d;best=c;}});
+  return best||list[0];
+}
+
+/* 圖解卡 */
+function drawCards(){
+  var g,L,i;
+  // ① 晶體
+  var s1=$('rid-f1');g=el('g',{},s1);
+  var c1=nearest(TEX.granite(g,rng(11),1.7),110,105);L=lg(s1);
+  el('polygon',{points:poly(c1.pts),fill:'none',stroke:'#ffd400','stroke-width':3.5,'stroke-linejoin':'round'},L);
+  label(L,200,24,c1.cx,c1.cy,'一粒晶體：有棱有角');
+  label(L,165,182,c1.pts[2][0],c1.pts[2][1],'晶體緊扣，冇空隙');
+
+  // ② 層理同層面
+  var s2=$('rid-f2');g=el('g',{},s2);
+  var res=layered(g,rng(22),1,{th:24,amp:1.5,k:0.02,colors:['#dcc493','#9c9e9a','#cfb17b','#b9a27a','#e6d3a8','#85878a'],grain:[0.6,1.6],grainColors:['#a5844c','#f5ead0','#6d6d6d'],density:35,lineColor:'#5e4a2c',lw:1.2});
+  var b=res.b,n=b.length-1,pi=Math.max(1,Math.floor(n/2));
+  var top=b[pi][7][1],bot=Math.min(b[pi+1][7][1],H),sz=Math.max(8,Math.min(13,bot-top-4));
+  shell(g,60,bot-2,sz);
+  L=lg(s2);
+  el('path',{d:line(b[pi]),fill:'none',stroke:'#ffd400','stroke-width':3.5},L);
+  label(L,200,Math.max(14,b[pi][19][1]-30),180,b[pi][19][1],'層面：層與層嘅分界');
+  label(L,70,Math.max(14,bot-2-sz-26),60,bot-2-sz/2,'化石');
+  var yA=b[1][30][1],yB=b[Math.max(2,n-1)][30][1];
+  el('path',{d:'M294,'+f1(yA)+' L284,'+f1(yA)+' L284,'+f1(yB)+' L294,'+f1(yB),fill:'none',stroke:'#111','stroke-width':4},L);
+  el('path',{d:'M294,'+f1(yA)+' L284,'+f1(yA)+' L284,'+f1(yB)+' L294,'+f1(yB),fill:'none',stroke:'#ffd400','stroke-width':2},L);
+  var yl=Math.min(185,Math.max(yA+10,b[pi][20][1]+32));
+  label(L,215,yl,284,yl,'層理：一層層疊起');
+
+  // ③ 葉理
+  var s3=$('rid-f3');g=el('g',{},s3);
+  var gs=1.3,gr=TEX.gneiss(g,rng(33),gs),A=9*gs,K=0.025/gs;L=lg(s3);
+  el('path',{d:line(wav(100,A,K,gr.ph)),fill:'none',stroke:'#ffd400','stroke-width':2.5,'stroke-dasharray':'8 5'},L);
+  arrow(L,268,2,34,'#e53935');arrow(L,268,198,166,'#e53935');
+  box(L,236,20,'壓力');box(L,236,182,'壓力');
+  label(L,95,24,90,100+A*Math.sin(90*K+gr.ph),'葉理：礦物平行排列');
+  label(L,105,180,150,140,'深淺條帶（片麻岩）');
+
+  // ④ 晶體（比較）
+  var s4=$('rid-f4');g=el('g',{},s4);
+  var c4=nearest(TEX.granite(g,rng(44),1.2),150,105);L=lg(s4);
+  el('polygon',{points:poly(c4.pts),fill:'none',stroke:'#ffd400','stroke-width':3.5,'stroke-linejoin':'round'},L);
+  label(L,150,24,c4.cx,c4.cy,'晶體：有棱角、互相緊扣');
+
+  // ⑤ 碎屑（比較）
+  var s5=$('rid-f5');g=el('g',{},s5);
+  el('rect',{x:0,y:0,width:W,height:H,fill:'#cdb68a'},g);
+  var r5=rng(55);
+  for(i=0;i<500;i++){el('circle',{cx:f1(r5()*W),cy:f1(r5()*H),r:f1(0.6+r5()),fill:pick(r5,['#b39a6b','#e2d2ae','#9c8456'])},g);}
+  var pb=pebbles(g,r5,1.5,['#efe7d6','#d9c7a3','#a99a86','#8b7b66','#e3d2b8']);
+  L=lg(s5);
+  var p0=pb[0],bd=1e9;
+  pb.forEach(function(p){var d=Math.hypot(p.x-150,p.y-100);if(d<bd){bd=d;p0=p;}});
+  label(L,150,24,p0.x,p0.y,'碎屑：圓滑顆粒');
+  var mx=150,my=150;
+  for(i=0;i<300;i++){
+    var tx=40+r5()*220,ty=70+r5()*90,ok=true;
+    for(var j=0;j<pb.length;j++){if(Math.hypot(tx-pb[j].x,ty-pb[j].y)<pb[j].rx+5){ok=false;break;}}
+    if(ok){mx=tx;my=ty;break;}
+  }
+  label(L,150,182,mx,my,'膠結物：黏住顆粒');
+}
+
+/* 模擬題目 */
+var NAME={ig:'火成岩',sed:'沉積岩',meta:'變質岩'};
+var Q=[
+ {place:'獅子山（行山）',desc:'路邊有塊淺色嘅石，表面有粉紅、灰白同黑色嘅斑點，粒粒都睇得清楚。',tex:'granite',s:1,zs:2.4,seed:101,ans:'ig',
+  key:'大粒晶體互相緊扣，排列冇方向',
+  explain:'岩漿喺地底深處慢慢冷卻，晶體有時間長大，形成<b>花崗岩</b>（侵入火成岩）。香港好多山都係花崗岩。'},
+ {place:'東平洲（海邊）',desc:'啲石一層層好似千層糕，用手輕輕都可以沿住層剝開。',tex:'shale',s:1,zs:2.5,seed:202,ans:'sed',
+  key:'一層層薄薄嘅層理，沿層面好易剝開；顆粒好幼，冇晶體',
+  explain:'泥同幼沙喺水底一層層沉積，再被壓實、膠結，形成<b>頁岩／粉砂岩</b>。'},
+ {place:'地理室標本',desc:'一塊有深色同淺色條紋嘅石，條紋仲有少少彎曲。',tex:'gneiss',s:1,zs:2,seed:303,ans:'meta',
+  key:'有晶體，但晶體排成平行嘅深淺條帶＝葉理',
+  explain:'岩石喺地底受高溫高壓，礦物重新排列成條帶，形成<b>片麻岩</b>。',
+  trap:'有條紋唔一定係層理！層理係碎屑一層層沉積而成；葉理係晶體受壓後平行排列，條帶經常彎曲。見到晶體亦唔好即刻揀火成岩，要睇晶體有冇排列方向。'},
+ {place:'赤洲（海邊）',desc:'紅色嘅石入面夾住好多圓滑嘅石仔，石仔大細唔一。',tex:'conglomerate',s:1,zs:2,seed:404,ans:'sed',
+  key:'圓滑碎屑被膠結物黏住，顆粒之間唔係緊扣',
+  explain:'石仔經河流搬運被磨圓，再同沙泥一齊沉積、膠結，形成<b>礫岩</b>。',
+  trap:'見到大顆粒唔等於係晶體！晶體有棱角、互相緊扣；碎屑圓滑，之間有膠結物。'},
+ {place:'地理室標本',desc:'一塊深灰色、拎上手好重嘅石，表面有好多細細嘅窿，肉眼睇唔到有晶體。',tex:'basalt',s:1,zs:2.6,seed:505,ans:'ig',
+  key:'晶體好細（要放大先見到），有氣孔',
+  explain:'熔岩噴出地面後快速冷卻，晶體冇時間長大；熔岩入面嘅氣體走咗，留低氣孔，形成<b>玄武岩</b>（噴出火成岩）。',
+  trap:'睇唔到晶體唔代表冇晶體，可能只係晶體太細。'},
+ {place:'地理室標本',desc:'一塊銀灰色嘅石，喺陽光下閃閃發光，好多細塊片狀礦物向住同一方向排列，入面仲有幾粒暗紅色晶體。',tex:'schist',s:1,zs:2.2,seed:606,ans:'meta',
+  key:'片狀礦物（雲母）平行排列＝葉理',
+  explain:'岩石受高壓，雲母等片狀礦物排成同一方向，形成<b>片岩</b>。暗紅色晶體係石榴子石。'},
+ {place:'地理室標本',challenge:true,desc:'一塊白色嘅石，表面好似砂糖咁一粒粒，晶體排列冇方向。老師滴咗稀鹽酸，佢會起泡。',tex:'marble',s:1,zs:2.4,seed:707,ans:'meta',
+  key:'細粒晶體互相緊扣，但冇葉理；遇酸起泡',
+  explain:'<b>大理岩</b>係石灰岩受高溫變質，方解石重新結晶而成，所以有晶體但冇葉理。滴酸起泡係因為主要成分係碳酸鈣。',
+  trap:'唔係所有變質岩都有葉理！白色、似砂糖、遇酸起泡就係大理岩嘅線索。'}
+];
+
+var qi=0,score=0,answered=false,finished=false;
+var btns=document.querySelectorAll('#rid-app .rid-choices button');
+
+function drawSample(q){
+  var svg=$('rid-sample');clear(svg);var r=rng(q.seed);
+  el('rect',{x:0,y:0,width:W,height:H,fill:'#dfe8d8'},svg);
+  var id='rid-c'+(uid++),gid='rid-g'+(uid++),defs=el('defs',{},svg),cp=el('clipPath',{id:id},defs);
+  var rg=el('radialGradient',{id:gid,cx:'35%',cy:'30%',r:'75%'},defs);
+  el('stop',{offset:'0%','stop-color':'#fff','stop-opacity':0.25},rg);
+  el('stop',{offset:'100%','stop-color':'#000','stop-opacity':0.35},rg);
+  var pts=[];
+  for(var a=0;a<14;a++){var ang=a/14*Math.PI*2,k=0.85+r()*0.3;pts.push([150+Math.cos(ang)*125*k,104+Math.sin(ang)*80*k]);}
+  el('ellipse',{cx:150,cy:190,rx:120,ry:8,fill:'#000',opacity:0.15},svg);
+  el('polygon',{points:poly(pts)},cp);
+  var g=el('g',{'clip-path':'url(#'+id+')'},svg);
+  TEX[q.tex](g,rng(q.seed+7),q.s||1);
+  el('polygon',{points:poly(pts),fill:'url(#'+gid+')',stroke:'#333','stroke-width':2},svg);
+}
+function drawZoom(q){
+  var svg=$('rid-zoom');clear(svg);
+  el('rect',{x:0,y:0,width:W,height:H,fill:'#f4f4f4'},svg);
+  var id='rid-c'+(uid++),defs=el('defs',{},svg),cp=el('clipPath',{id:id},defs);
+  el('circle',{cx:130,cy:95,r:82},cp);
+  var g=el('g',{'clip-path':'url(#'+id+')'},svg);
+  TEX[q.tex](g,rng(q.seed+99),q.zs||2.4);
+  el('line',{x1:190,y1:153,x2:262,y2:192,stroke:'#5a3d1e','stroke-width':14,'stroke-linecap':'round'},svg);
+  el('circle',{cx:130,cy:95,r:82,fill:'none',stroke:'#444','stroke-width':9},svg);
+}
+function prog(){
+  var q=Q[qi];
+  $('rid-progress').innerHTML='第 <b>'+(qi+1)+'</b> / '+Q.length+' 題　｜　得分：<b>'+score+'</b>'+(q.challenge?'　<span class="rid-tag rid-meta">挑戰題</span>':'');
+}
+function load(){
+  var q=Q[qi];answered=false;prog();
+  $('rid-scene').innerHTML='📍 <b>'+q.place+'</b>：'+q.desc+'<br>❓ 呢塊係咩岩石？';
+  drawSample(q);
+  $('rid-zoomwrap').style.display='none';$('rid-zoombtn').style.display='';
+  for(var i=0;i<btns.length;i++){btns[i].className='';btns[i].disabled=false;btns[i].style.display='';}
+  $('rid-feedback').className='';$('rid-feedback').innerHTML='';
+  $('rid-next').style.display='none';
+}
+function showZoom(){drawZoom(Q[qi]);$('rid-zoomwrap').style.display='';$('rid-zoombtn').style.display='none';}
+function answer(a){
+  if(answered||finished){return;}
+  answered=true;var q=Q[qi],ok=(a===q.ans);if(ok){score++;}
+  for(var i=0;i<btns.length;i++){
+    var bt=btns[i],v=bt.getAttribute('data-a');bt.disabled=true;
+    if(v===q.ans){bt.className='rid-right';}else if(v===a){bt.className='rid-wrong';}
+  }
+  showZoom();prog();
+  var fb=$('rid-feedback');fb.className=ok?'ok':'no';
+  fb.innerHTML=(ok?'✅ 答啱！':'❌ 唔啱，答案係 <b>'+NAME[q.ans]+'</b>。')+
+    '<br>🔍 <b>重點特徵：</b>'+q.key+'<br>📖 '+q.explain+(q.trap?'<br>⚠️ <b>陷阱：</b>'+q.trap:'');
+  $('rid-next').textContent=(qi<Q.length-1)?'下一題 ➜':'睇成績 🏁';
+  $('rid-next').style.display='';
+}
+function next(){
+  if(finished){finished=false;qi=0;score=0;load();return;}
+  if(qi<Q.length-1){qi++;load();return;}
+  finished=true;
+  $('rid-progress').innerHTML='';
+  $('rid-scene').innerHTML='🏁 完成！你答啱 <b>'+score+' / '+Q.length+'</b> 題。'+(score===Q.length?'💯 好犀利！':'<br>再試多次，記住留意：<b>晶體</b>、<b>層理</b>、<b>葉理</b>。');
+  clear($('rid-sample'));$('rid-zoomwrap').style.display='none';$('rid-zoombtn').style.display='none';
+  for(var i=0;i<btns.length;i++){btns[i].style.display='none';}
+  $('rid-feedback').className='';$('rid-feedback').innerHTML='';
+  $('rid-next').textContent='🔄 再玩一次';
+}
+
+for(var i=0;i<btns.length;i++){btns[i].addEventListener('click',function(){answer(this.getAttribute('data-a'));});}
+$('rid-zoombtn').addEventListener('click',showZoom);
+$('rid-next').addEventListener('click',next);
+$('rid-toggle').addEventListener('change',function(){$('rid-app').classList.toggle('rid-nolabel',!this.checked);});
+
+drawCards();
+load();
+})();
+</script>
+<!-- ===== 快速辨認（圖解＋模擬）完 ===== -->
 </section>
 
 <!-- ===================== 香港實例 ===================== -->
